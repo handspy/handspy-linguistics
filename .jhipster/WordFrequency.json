@@ -1,0 +1,48 @@
+{
+  "name": "WordFrequency",
+  "fields": [
+    {
+      "fieldName": "word",
+      "fieldType": "String",
+      "javadoc": "Word in the text"
+    },
+    {
+      "fieldName": "frequency",
+      "fieldType": "Integer",
+      "javadoc": "Frequency of the word"
+    },
+    {
+      "fieldName": "content",
+      "fieldType": "Boolean",
+      "javadoc": "Is it a content word?"
+    },
+    {
+      "fieldName": "functional",
+      "fieldType": "Boolean",
+      "javadoc": "Is it a functional word?"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "analysis",
+      "otherEntityRelationshipName": "wordFrequency",
+      "relationshipValidateRules": "required",
+      "relationshipName": "analysis",
+      "otherEntityField": "id"
+    }
+  ],
+  "changelogDate": "20200522214350",
+  "javadoc": "The Word Frequency.\\n\\n@author José Carlos Paiva",
+  "entityTableName": "word_frequency",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "clientRootFolder": "",
+  "applications": ["linguistics"],
+  "microserviceName": "linguistics"
+}

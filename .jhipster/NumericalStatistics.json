@@ -1,0 +1,100 @@
+{
+  "name": "NumericalStatistics",
+  "fields": [
+    {
+      "fieldName": "nrOfCharacters",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "nrOfNonBlankCharacters",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "nrOfWords",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "nrOfDistinctWords",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "nrOfStopWords",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "nrOfErrors",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "nrOfFunctionalWords",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "nrOfDistinctFunctionalWords",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "nrOfContentWords",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "nrOfDistinctContentWords",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "nrOfDistinctLemmas",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "nrOfSentences",
+      "fieldType": "Integer"
+    },
+    {
+      "fieldName": "avgWordLength",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "avgNonStopWordLength",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "avgFunctionalWordLength",
+      "fieldType": "Double"
+    },
+    {
+      "fieldName": "avgContentWordLength",
+      "fieldType": "Double"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "analysis",
+      "otherEntityRelationshipName": "numericalStatistics",
+      "relationshipName": "analysis",
+      "otherEntityField": "id",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "analysis",
+      "otherEntityRelationshipName": "id",
+      "relationshipValidateRules": "required",
+      "relationshipName": "analysisId",
+      "ownerSide": false
+    }
+  ],
+  "changelogDate": "20200522214250",
+  "javadoc": "Numerical statistics.\\n\\n@author José Carlos Paiva",
+  "entityTableName": "numerical_statistics",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "clientRootFolder": "",
+  "applications": ["linguistics"],
+  "microserviceName": "linguistics"
+}

@@ -1,0 +1,38 @@
+{
+  "name": "LemmaFrequency",
+  "fields": [
+    {
+      "fieldName": "lemma",
+      "fieldType": "String",
+      "javadoc": "Lemma obtained from a word in the text"
+    },
+    {
+      "fieldName": "frequency",
+      "fieldType": "Integer",
+      "javadoc": "Frequency of the lemma"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "analysis",
+      "otherEntityRelationshipName": "lemmaFrequency",
+      "relationshipValidateRules": "required",
+      "relationshipName": "analysis",
+      "otherEntityField": "id"
+    }
+  ],
+  "changelogDate": "20200522214450",
+  "javadoc": "The Lemma Frequency.\\n\\n@author José Carlos Paiva",
+  "entityTableName": "lemma_frequency",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "clientRootFolder": "",
+  "applications": ["linguistics"],
+  "microserviceName": "linguistics"
+}

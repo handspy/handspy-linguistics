@@ -1,0 +1,64 @@
+{
+  "name": "Emotion",
+  "fields": [
+    {
+      "fieldName": "primary",
+      "fieldType": "PrimaryEmotion",
+      "javadoc": "Primary emotion",
+      "fieldValues": "SAFETY,WELL_BEING,BENEVOLENCE,ANXIETY,ILL_BEING,MALEVOLENCE",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "secondary",
+      "fieldType": "SecondaryEmotion",
+      "javadoc": "Secondary emotion",
+      "fieldValues": "COURAGE,CALM,HAPPINESS,LUCIDITY,ENTHUSIASM,RELIEF,SATISFACTION,AFFECTION,KINDNESS,FEAR,TENSION,SUFFERING,MADNESS,DEPRESSION,DISORDER,DISSATISFACTION,AGGRESSIVENESS,HATE"
+    },
+    {
+      "fieldName": "tertiary",
+      "fieldType": "TertiaryEmotion",
+      "javadoc": "Tertiary emotion",
+      "fieldValues": "AUDACITY,EXTROVERSION,TRANQUILITY,RELAXATION,HAPPINESS,PLEASURE,LAUGHTER,MENTAL_HEALTH,BALANCE,JOY,VIVACITY,ALERT,APPEASEMENT,LIBERATION,ESTEEM,SATIETY,LIKE,LOVE,DESIRE,ADMIRATION,ATTRACTION,GOODNESS,SWEETNESS,PATIENCE,HUMILITY,INTROVERSION,PAVOR,UNEASINESS,ANGUISH,CRY,PAIN,DRAMA,IMBALANCE,MENTAL_DISEASE,APATHY,FATIGUE,SADNESS,REMORSE,SHAKE,DISLIKE,FRUSTRATION,HUMILIATION,PRIDE,RAGE,ANGER,CRUELTY,IRRITATION,CONTEMPT,DISGUST,RESENTMENT"
+    },
+    {
+      "fieldName": "start",
+      "fieldType": "Integer",
+      "javadoc": "Start position of the emotion",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "size",
+      "fieldType": "Integer",
+      "javadoc": "Size of the emotion",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "note",
+      "fieldType": "String",
+      "javadoc": "Note about emotion"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "analysis",
+      "otherEntityRelationshipName": "emotion",
+      "relationshipValidateRules": "required",
+      "relationshipName": "analysis",
+      "otherEntityField": "id"
+    }
+  ],
+  "changelogDate": "20200522214550",
+  "javadoc": "An emotion present in the text.\\n\\n@author José Carlos Paiva",
+  "entityTableName": "emotion",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "clientRootFolder": "",
+  "applications": ["linguistics"],
+  "microserviceName": "linguistics"
+}

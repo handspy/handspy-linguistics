@@ -1,0 +1,69 @@
+{
+  "name": "Analysis",
+  "fields": [
+    {
+      "fieldName": "textId",
+      "fieldType": "Long"
+    },
+    {
+      "fieldName": "text",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "language",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "status",
+      "fieldType": "Status",
+      "fieldValues": "QUEUED,PROCESSING,ABORTED,COMPLETED,FAILED"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-one",
+      "otherEntityName": "numericalStatistics",
+      "otherEntityRelationshipName": "analysisId",
+      "relationshipName": "id",
+      "otherEntityField": "id",
+      "ownerSide": true
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "wordFrequency",
+      "otherEntityRelationshipName": "analysis",
+      "relationshipName": "wordFrequency"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "lemmaFrequency",
+      "otherEntityRelationshipName": "analysis",
+      "relationshipName": "lemmaFrequency"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "emotion",
+      "otherEntityRelationshipName": "analysis",
+      "relationshipName": "emotion"
+    },
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "partOfSpeech",
+      "otherEntityRelationshipName": "analysis",
+      "relationshipName": "partOfSpeech"
+    }
+  ],
+  "changelogDate": "20200522214150",
+  "javadoc": "Linguistic analysis conducted in a text.\\n\\n@author José Carlos Paiva",
+  "entityTableName": "analysis",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "clientRootFolder": "",
+  "applications": ["linguistics"],
+  "microserviceName": "linguistics"
+}

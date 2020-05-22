@@ -1,0 +1,52 @@
+{
+  "name": "PartOfSpeech",
+  "fields": [
+    {
+      "fieldName": "tag",
+      "fieldType": "PoSTag",
+      "javadoc": "Part of Speech tag",
+      "fieldValues": "ADJECTIVE,PREPOSITION,ADVERB,AUXILIAR_VERB,DETERMINER,COORDINATING_CONJUNCTION,INTERJECTION,NOUN,NUMERAL,PARTICLE,PRONOUN,PROPER_NOUN,PUNCTUATION,SUBORDINATING_CONJUNCTION,SYMBOL,VERB,OTHER",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "start",
+      "fieldType": "Integer",
+      "javadoc": "Start position of the tag",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "size",
+      "fieldType": "Integer",
+      "javadoc": "Size of the tag",
+      "fieldValidateRules": ["required"]
+    },
+    {
+      "fieldName": "note",
+      "fieldType": "String",
+      "javadoc": "Note about tag"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "analysis",
+      "otherEntityRelationshipName": "partOfSpeech",
+      "relationshipValidateRules": "required",
+      "relationshipName": "analysis",
+      "otherEntityField": "id"
+    }
+  ],
+  "changelogDate": "20200522214650",
+  "javadoc": "Annotation refering to the Part-of-Speech tag.\\n\\n@author José Carlos Paiva",
+  "entityTableName": "part_of_speech",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": true,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "clientRootFolder": "",
+  "applications": ["linguistics"],
+  "microserviceName": "linguistics"
+}
