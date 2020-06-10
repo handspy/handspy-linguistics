@@ -42,7 +42,7 @@
   "fluentMethods": true,
   "readOnly": false,
   "embedded": false,
-  "clientRootFolder": "",
+  "clientRootFolder": "linguistics",
   "applications": ["linguistics"],
   "microserviceName": "linguistics"
 }

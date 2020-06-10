@@ -1,5 +1,6 @@
 package pt.up.hs.linguistics;
 
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import pt.up.hs.linguistics.client.OAuth2InterceptedFeignConfiguration;
 import pt.up.hs.linguistics.config.ApplicationProperties;
 
@@ -23,10 +24,14 @@ import java.util.Arrays;
 import java.util.Collection;
 
 @ComponentScan(
-    excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = OAuth2InterceptedFeignConfiguration.class)
+    excludeFilters = @ComponentScan.Filter(
+        type = FilterType.ASSIGNABLE_TYPE,
+        classes = OAuth2InterceptedFeignConfiguration.class
+    )
 )
 @SpringBootApplication
 @EnableConfigurationProperties({ApplicationProperties.class})
+@EnableDiscoveryClient
 public class LinguisticsApp {
 
     private static final Logger log = LoggerFactory.getLogger(LinguisticsApp.class);

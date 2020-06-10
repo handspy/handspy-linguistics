@@ -1,8 +1,20 @@
 package pt.up.hs.linguistics.domain.enumeration;
 
 /**
- * The PrimaryEmotion enumeration.
+ * The Primary emotion enumeration.
  */
 public enum PrimaryEmotion {
-    SAFETY, WELL_BEING, BENEVOLENCE, ANXIETY, ILL_BEING, MALEVOLENCE
+    BENEVOLENCE,
+    MALEVOLENCE,
+
+    COMFORT,
+    DISCOMFORT,
+
+    SAFETY,
+    ANXIETY,
+
+    SURPRISE,
+    INDIFFERENCE,
+
+    NON_SPECIFIC
 }

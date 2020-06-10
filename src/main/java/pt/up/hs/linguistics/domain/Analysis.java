@@ -6,13 +6,14 @@ import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.DBRef;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 import pt.up.hs.linguistics.domain.enumeration.Status;
 
 /**
- * Linguistic analysis conducted in a text.\n\n@author José Carlos Paiva
+ * Linguistic analysis conducted in a text.
+ *
+ * @author José Carlos Paiva
  */
 @Document(collection = "analysis")
 public class Analysis implements Serializable {
@@ -22,11 +23,11 @@ public class Analysis implements Serializable {
     @Id
     private String id;
 
+    @Field("project_id")
+    private Long projectId;
+
     @Field("text_id")
     private Long textId;
-
-    @Field("text")
-    private String text;
 
     @Field("language")
     private String language;
@@ -34,25 +35,82 @@ public class Analysis implements Serializable {
     @Field("status")
     private Status status;
 
-    @DBRef
-    @Field("id")
-    private NumericalStatistics id;
+    @Field("character_count")
+    private Integer characterCount;
 
-    @DBRef
-    @Field("wordFrequency")
-    private Set<WordFrequency> wordFrequencies = new HashSet<>();
+    @Field("non_blank_character_count")
+    private Integer nonBlankCharacterCount;
 
-    @DBRef
-    @Field("lemmaFrequency")
-    private Set<LemmaFrequency> lemmaFrequencies = new HashSet<>();
+    @Field("word_count")
+    private Integer wordCount;
+
+    @Field("distinct_word_count")
+    private Integer distinctWordCount;
+
+    @Field("functional_word_count")
+    private Integer functionalWordCount;
+
+    @Field("distinct_functional_word_count")
+    private Integer distinctFunctionalWordCount;
+
+    @Field("content_word_count")
+    private Integer contentWordCount;
+
+    @Field("distinct_content_word_count")
+    private Integer distinctContentWordCount;
+
+    @Field("distinct_lemma_count")
+    private Integer distinctLemmaCount;
+
+    @Field("word_avg_length")
+    private Double wordAvgLength;
+
+    @Field("functional_word_avg_count")
+    private Double functionalWordAvgLength;
+
+    @Field("content_word_avg_count")
+    private Double contentWordAvgLength;
+
+    @Field("sentence_count")
+    private Integer sentenceCount;
+
+    @Field("lexical_density")
+    private Double lexicalDensity;
+
+    @Field("base_ttr")
+    private Double baseTTR;
+
+    @Field("hdd")
+    private Double hdd;
+
+    @Field("mtld")
+    private Double mtld;
+
+    @Field("vocd")
+    private Double vocd;
+
+    @Field("words_by_category")
+    private Map<String, Set<String>> wordsByCategory;
+
+    @Field("content_word_frequencies")
+    private Map<String, Integer> contentWordFrequencies;
+
+    @Field("functional_word_frequencies")
+    private Map<String, Integer> functionalWordFrequencies;
+
+    @Field("lemma_frequencies")
+    private Map<String, Integer> lemmaFrequencies;
+
+    @Field("cooccurrences")
+    private Map<String, Double> coOccurrences;
 
     @DBRef
     @Field("emotion")
     private Set<Emotion> emotions = new HashSet<>();
 
     @DBRef
-    @Field("partOfSpeech")
-    private Set<PartOfSpeech> partOfSpeeches = new HashSet<>();
+    @Field("part_of_speech")
+    private Set<PartOfSpeech> partsOfSpeech = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
@@ -61,6 +119,19 @@ public class Analysis implements Serializable {
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public Analysis projectId(Long projectId) {
+        this.projectId = projectId;
+        return this;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
     }
 
     public Long getTextId() {
@@ -74,19 +145,6 @@ public class Analysis implements Serializable {
 
     public void setTextId(Long textId) {
         this.textId = textId;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public Analysis text(String text) {
-        this.text = text;
-        return this;
-    }
-
-    public void setText(String text) {
-        this.text = text;
     }
 
     public String getLanguage() {
@@ -115,66 +173,366 @@ public class Analysis implements Serializable {
         this.status = status;
     }
 
-    public NumericalStatistics getId() {
-        return id;
+    public Integer getCharacterCount() {
+        return characterCount;
     }
 
-    public Analysis id(NumericalStatistics numericalStatistics) {
-        this.id = numericalStatistics;
+    public Analysis characterCount(Integer characterCount) {
+        this.characterCount = characterCount;
         return this;
     }
 
-    public void setId(NumericalStatistics numericalStatistics) {
-        this.id = numericalStatistics;
+    public void setCharacterCount(Integer characterCount) {
+        this.characterCount = characterCount;
     }
 
-    public Set<WordFrequency> getWordFrequencies() {
-        return wordFrequencies;
+    public Integer getNonBlankCharacterCount() {
+        return nonBlankCharacterCount;
     }
 
-    public Analysis wordFrequencies(Set<WordFrequency> wordFrequencies) {
-        this.wordFrequencies = wordFrequencies;
+    public Analysis nonBlankCharacterCount(Integer nonBlankCharacterCount) {
+        this.nonBlankCharacterCount = nonBlankCharacterCount;
         return this;
     }
 
-    public Analysis addWordFrequency(WordFrequency wordFrequency) {
-        this.wordFrequencies.add(wordFrequency);
-        wordFrequency.setAnalysis(this);
+    public void setNonBlankCharacterCount(Integer nonBlankCharacterCount) {
+        this.nonBlankCharacterCount = nonBlankCharacterCount;
+    }
+
+    public Integer getWordCount() {
+        return wordCount;
+    }
+
+    public Analysis wordCount(Integer wordCount) {
+        this.wordCount = wordCount;
         return this;
     }
 
-    public Analysis removeWordFrequency(WordFrequency wordFrequency) {
-        this.wordFrequencies.remove(wordFrequency);
-        wordFrequency.setAnalysis(null);
+    public void setWordCount(Integer wordCount) {
+        this.wordCount = wordCount;
+    }
+
+    public Integer getDistinctWordCount() {
+        return distinctWordCount;
+    }
+
+    public Analysis distinctWordCount(Integer distinctWordCount) {
+        this.distinctWordCount = distinctWordCount;
         return this;
     }
 
-    public void setWordFrequencies(Set<WordFrequency> wordFrequencies) {
-        this.wordFrequencies = wordFrequencies;
+    public void setDistinctWordCount(Integer distinctWordCount) {
+        this.distinctWordCount = distinctWordCount;
     }
 
-    public Set<LemmaFrequency> getLemmaFrequencies() {
+    public Integer getFunctionalWordCount() {
+        return functionalWordCount;
+    }
+
+    public Analysis functionalWordCount(Integer functionalWordCount) {
+        this.functionalWordCount = functionalWordCount;
+        return this;
+    }
+
+    public void setFunctionalWordCount(Integer functionalWordCount) {
+        this.functionalWordCount = functionalWordCount;
+    }
+
+    public Integer getDistinctFunctionalWordCount() {
+        return distinctFunctionalWordCount;
+    }
+
+    public Analysis distinctFunctionalWordCount(Integer distinctFunctionalWordCount) {
+        this.distinctFunctionalWordCount = distinctFunctionalWordCount;
+        return this;
+    }
+
+    public void setDistinctFunctionalWordCount(Integer distinctFunctionalWordCount) {
+        this.distinctFunctionalWordCount = distinctFunctionalWordCount;
+    }
+
+    public Integer getContentWordCount() {
+        return contentWordCount;
+    }
+
+    public Analysis contentWordCount(Integer contentWordCount) {
+        this.contentWordCount = contentWordCount;
+        return this;
+    }
+
+    public void setContentWordCount(Integer contentWordCount) {
+        this.contentWordCount = contentWordCount;
+    }
+
+    public Integer getDistinctContentWordCount() {
+        return distinctContentWordCount;
+    }
+
+    public Analysis distinctContentWordCount(Integer distinctContentWordCount) {
+        this.distinctContentWordCount = distinctContentWordCount;
+        return this;
+    }
+
+    public void setDistinctContentWordCount(Integer distinctContentWordCount) {
+        this.distinctContentWordCount = distinctContentWordCount;
+    }
+
+    public Integer getDistinctLemmaCount() {
+        return distinctLemmaCount;
+    }
+
+    public Analysis distinctLemmaCount(Integer distinctLemmaCount) {
+        this.distinctLemmaCount = distinctLemmaCount;
+        return this;
+    }
+
+    public void setDistinctLemmaCount(Integer distinctLemmaCount) {
+        this.distinctLemmaCount = distinctLemmaCount;
+    }
+
+    public Double getWordAvgLength() {
+        return wordAvgLength;
+    }
+
+    public Analysis wordAvgLength(Double wordAvgLength) {
+        this.wordAvgLength = wordAvgLength;
+        return this;
+    }
+
+    public void setWordAvgLength(Double wordAvgLength) {
+        this.wordAvgLength = wordAvgLength;
+    }
+
+    public Double getFunctionalWordAvgLength() {
+        return functionalWordAvgLength;
+    }
+
+    public Analysis functionalWordAvgLength(Double functionalWordAvgLength) {
+        this.functionalWordAvgLength = functionalWordAvgLength;
+        return this;
+    }
+
+    public void setFunctionalWordAvgLength(Double functionalWordAvgLength) {
+        this.functionalWordAvgLength = functionalWordAvgLength;
+    }
+
+    public Double getContentWordAvgLength() {
+        return contentWordAvgLength;
+    }
+
+    public Analysis contentWordAvgLength(Double contentWordAvgLength) {
+        this.contentWordAvgLength = contentWordAvgLength;
+        return this;
+    }
+
+    public void setContentWordAvgLength(Double contentWordAvgLength) {
+        this.contentWordAvgLength = contentWordAvgLength;
+    }
+
+    public Integer getSentenceCount() {
+        return sentenceCount;
+    }
+
+    public Analysis sentenceCount(Integer sentenceCount) {
+        this.sentenceCount = sentenceCount;
+        return this;
+    }
+
+    public void setSentenceCount(Integer sentenceCount) {
+        this.sentenceCount = sentenceCount;
+    }
+
+    public Double getLexicalDensity() {
+        return lexicalDensity;
+    }
+
+    public Analysis lexicalDensity(Double lexicalDensity) {
+        this.lexicalDensity = lexicalDensity;
+        return this;
+    }
+
+    public void setLexicalDensity(Double lexicalDensity) {
+        this.lexicalDensity = lexicalDensity;
+    }
+
+    public Double getBaseTTR() {
+        return baseTTR;
+    }
+
+    public Analysis baseTTR(Double baseTTR) {
+        this.baseTTR = baseTTR;
+        return this;
+    }
+
+    public void setBaseTTR(Double baseTTR) {
+        this.baseTTR = baseTTR;
+    }
+
+    public Double getHdd() {
+        return hdd;
+    }
+
+    public Analysis hdd(Double hdd) {
+        this.hdd = hdd;
+        return this;
+    }
+
+    public void setHdd(Double hdd) {
+        this.hdd = hdd;
+    }
+
+    public Double getMtld() {
+        return mtld;
+    }
+
+    public Analysis mtld(Double mtld) {
+        this.mtld = mtld;
+        return this;
+    }
+
+    public void setMtld(Double mtld) {
+        this.mtld = mtld;
+    }
+
+    public Double getVocd() {
+        return vocd;
+    }
+
+    public Analysis vocd(Double vocd) {
+        this.vocd = vocd;
+        return this;
+    }
+
+    public void setVocd(Double vocd) {
+        this.vocd = vocd;
+    }
+
+    public Map<String, Set<String>> getWordsByCategory() {
+        return wordsByCategory;
+    }
+
+    public Analysis wordsByCategory(Map<String, Set<String>> wordsByCategory) {
+        this.wordsByCategory = wordsByCategory;
+        return this;
+    }
+
+    public void setWordsByCategory(Map<String, Set<String>> wordsByCategory) {
+        this.wordsByCategory = wordsByCategory;
+    }
+
+    public Map<String, Integer> getContentWordFrequencies() {
+        return contentWordFrequencies;
+    }
+
+    public Analysis contentWordFrequencies(Map<String, Integer> contentWordFrequencies) {
+        this.contentWordFrequencies = contentWordFrequencies;
+        return this;
+    }
+
+    public Analysis addContentWordFrequency(String word, Integer frequency) {
+        if (contentWordFrequencies == null) {
+            contentWordFrequencies = new HashMap<>();
+        }
+        contentWordFrequencies.put(word, frequency);
+        return this;
+    }
+
+    public Analysis removeContentWordFrequency(String word) {
+        if (contentWordFrequencies == null) {
+            return this;
+        }
+        contentWordFrequencies.remove(word);
+        return this;
+    }
+
+    public void setContentWordFrequencies(Map<String, Integer> contentWordFrequencies) {
+        this.contentWordFrequencies = contentWordFrequencies;
+    }
+
+    public Map<String, Integer> getFunctionalWordFrequencies() {
+        return functionalWordFrequencies;
+    }
+
+    public Analysis functionalWordFrequencies(Map<String, Integer> functionalWordFrequencies) {
+        this.functionalWordFrequencies = functionalWordFrequencies;
+        return this;
+    }
+
+    public Analysis addFunctionalWordFrequency(String word, Integer frequency) {
+        if (functionalWordFrequencies == null) {
+            functionalWordFrequencies = new HashMap<>();
+        }
+        functionalWordFrequencies.put(word, frequency);
+        return this;
+    }
+
+    public Analysis removeFunctionalWordFrequency(String word) {
+        if (functionalWordFrequencies == null) {
+            return this;
+        }
+        functionalWordFrequencies.remove(word);
+        return this;
+    }
+
+    public void setFunctionalWordFrequencies(Map<String, Integer> functionalWordFrequencies) {
+        this.functionalWordFrequencies = functionalWordFrequencies;
+    }
+
+    public Map<String, Double> getCoOccurrences() {
+        return coOccurrences;
+    }
+
+    public Analysis coOccurrences(Map<String, Double> coOccurrences) {
+        this.coOccurrences = coOccurrences;
+        return this;
+    }
+
+    public Analysis addCoOccurrence(String words, Double frequency) {
+        if (coOccurrences == null) {
+            coOccurrences = new HashMap<>();
+        }
+        coOccurrences.put(words, frequency);
+        return this;
+    }
+
+    public Analysis removeCoOccurrence(String words) {
+        if (coOccurrences == null) {
+            return this;
+        }
+        coOccurrences.remove(words);
+        return this;
+    }
+
+    public void setCoOccurrences(Map<String, Double> coOccurrences) {
+        this.coOccurrences = coOccurrences;
+    }
+
+    public Map<String, Integer> getLemmaFrequencies() {
         return lemmaFrequencies;
     }
 
-    public Analysis lemmaFrequencies(Set<LemmaFrequency> lemmaFrequencies) {
+    public Analysis lemmaFrequencies(Map<String, Integer> lemmaFrequencies) {
         this.lemmaFrequencies = lemmaFrequencies;
         return this;
     }
 
-    public Analysis addLemmaFrequency(LemmaFrequency lemmaFrequency) {
-        this.lemmaFrequencies.add(lemmaFrequency);
-        lemmaFrequency.setAnalysis(this);
+    public Analysis addLemmaFrequency(String word, Integer frequency) {
+        if (lemmaFrequencies == null) {
+            lemmaFrequencies = new HashMap<>();
+        }
+        lemmaFrequencies.put(word, frequency);
         return this;
     }
 
-    public Analysis removeLemmaFrequency(LemmaFrequency lemmaFrequency) {
-        this.lemmaFrequencies.remove(lemmaFrequency);
-        lemmaFrequency.setAnalysis(null);
+    public Analysis removeLemmaFrequency(String word) {
+        if (lemmaFrequencies == null) {
+            return this;
+        }
+        lemmaFrequencies.remove(word);
         return this;
     }
 
-    public void setLemmaFrequencies(Set<LemmaFrequency> lemmaFrequencies) {
+    public void setLemmaFrequencies(Map<String, Integer> lemmaFrequencies) {
         this.lemmaFrequencies = lemmaFrequencies;
     }
 
@@ -203,29 +561,29 @@ public class Analysis implements Serializable {
         this.emotions = emotions;
     }
 
-    public Set<PartOfSpeech> getPartOfSpeeches() {
-        return partOfSpeeches;
+    public Set<PartOfSpeech> getPartsOfSpeech() {
+        return partsOfSpeech;
     }
 
     public Analysis partOfSpeeches(Set<PartOfSpeech> partOfSpeeches) {
-        this.partOfSpeeches = partOfSpeeches;
+        this.partsOfSpeech = partOfSpeeches;
         return this;
     }
 
     public Analysis addPartOfSpeech(PartOfSpeech partOfSpeech) {
-        this.partOfSpeeches.add(partOfSpeech);
+        this.partsOfSpeech.add(partOfSpeech);
         partOfSpeech.setAnalysis(this);
         return this;
     }
 
     public Analysis removePartOfSpeech(PartOfSpeech partOfSpeech) {
-        this.partOfSpeeches.remove(partOfSpeech);
+        this.partsOfSpeech.remove(partOfSpeech);
         partOfSpeech.setAnalysis(null);
         return this;
     }
 
-    public void setPartOfSpeeches(Set<PartOfSpeech> partOfSpeeches) {
-        this.partOfSpeeches = partOfSpeeches;
+    public void setPartsOfSpeech(Set<PartOfSpeech> partsOfSpeech) {
+        this.partsOfSpeech = partsOfSpeech;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
@@ -249,11 +607,36 @@ public class Analysis implements Serializable {
     @Override
     public String toString() {
         return "Analysis{" +
-            "id=" + getId() +
-            ", textId=" + getTextId() +
-            ", text='" + getText() + "'" +
-            ", language='" + getLanguage() + "'" +
-            ", status='" + getStatus() + "'" +
-            "}";
+            "id='" + id + '\'' +
+            ", projectId=" + projectId +
+            ", textId=" + textId +
+            ", language='" + language + '\'' +
+            ", status=" + status +
+            ", characterCount=" + characterCount +
+            ", nonBlankCharacterCount=" + nonBlankCharacterCount +
+            ", wordCount=" + wordCount +
+            ", distinctWordCount=" + distinctWordCount +
+            ", functionalWordCount=" + functionalWordCount +
+            ", distinctFunctionalWordCount=" + distinctFunctionalWordCount +
+            ", contentWordCount=" + contentWordCount +
+            ", distinctContentWordCount=" + distinctContentWordCount +
+            ", distinctLemmaCount=" + distinctLemmaCount +
+            ", wordAvgLength=" + wordAvgLength +
+            ", functionalWordAvgLength=" + functionalWordAvgLength +
+            ", contentWordAvgLength=" + contentWordAvgLength +
+            ", sentenceCount=" + sentenceCount +
+            ", lexicalDensity=" + lexicalDensity +
+            ", baseTTR=" + baseTTR +
+            ", hdd=" + hdd +
+            ", mtld=" + mtld +
+            ", vocd=" + vocd +
+            ", wordsByCategory=" + wordsByCategory +
+            ", contentWordFrequencies=" + contentWordFrequencies +
+            ", functionalWordFrequencies=" + functionalWordFrequencies +
+            ", lemmaFrequencies=" + lemmaFrequencies +
+            ", coOccurrences=" + coOccurrences +
+            ", emotions=" + emotions +
+            ", partsOfSpeech=" + partsOfSpeech +
+            '}';
     }
 }

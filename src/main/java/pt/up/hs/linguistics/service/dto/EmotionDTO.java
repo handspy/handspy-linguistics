@@ -13,8 +13,10 @@ import pt.up.hs.linguistics.domain.enumeration.TertiaryEmotion;
  */
 @ApiModel(description = "An emotion present in the text.\n\n@author José Carlos Paiva")
 public class EmotionDTO implements Serializable {
-    
+
     private String id;
+
+    private String analysisId;
 
     /**
      * Primary emotion
@@ -56,8 +58,6 @@ public class EmotionDTO implements Serializable {
     private String note;
 
 
-    private String analysisId;
-    
     public String getId() {
         return id;
     }
@@ -144,13 +144,13 @@ public class EmotionDTO implements Serializable {
     public String toString() {
         return "EmotionDTO{" +
             "id=" + getId() +
+            ", analysisId='" + getAnalysisId() + "'" +
             ", primary='" + getPrimary() + "'" +
             ", secondary='" + getSecondary() + "'" +
             ", tertiary='" + getTertiary() + "'" +
             ", start=" + getStart() +
             ", size=" + getSize() +
             ", note='" + getNote() + "'" +
-            ", analysisId='" + getAnalysisId() + "'" +
             "}";
     }
 }

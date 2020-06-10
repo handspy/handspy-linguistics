@@ -20,8 +20,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@RestController
-@RequestMapping("/api/linguistics-kafka")
+/*@RestController
+@RequestMapping("/api/linguistics-kafka")*/
 public class LinguisticsKafkaResource {
 
     private final Logger log = LoggerFactory.getLogger(LinguisticsKafkaResource.class);

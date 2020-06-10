@@ -4,6 +4,7 @@ import pt.up.hs.linguistics.LinguisticsApp;
 import pt.up.hs.linguistics.config.SecurityBeanOverrideConfiguration;
 import pt.up.hs.linguistics.domain.PartOfSpeech;
 import pt.up.hs.linguistics.domain.Analysis;
+import pt.up.hs.linguistics.repository.AnalysisRepository;
 import pt.up.hs.linguistics.repository.PartOfSpeechRepository;
 import pt.up.hs.linguistics.service.PartOfSpeechService;
 import pt.up.hs.linguistics.service.dto.PartOfSpeechDTO;
@@ -35,6 +36,10 @@ import pt.up.hs.linguistics.domain.enumeration.PoSTag;
 @WithMockUser
 public class PartOfSpeechResourceIT {
 
+    private static final Long DEFAULT_PROJECT_ID = 1L;
+    private static final Long DEFAULT_TEXT_ID = 1001L;
+    private static final String DEFAULT_ANALYSIS_ID = "fixed-id-for-tests";
+
     private static final PoSTag DEFAULT_TAG = PoSTag.ADJECTIVE;
     private static final PoSTag UPDATED_TAG = PoSTag.PREPOSITION;
 
@@ -48,6 +53,9 @@ public class PartOfSpeechResourceIT {
     private static final String UPDATED_NOTE = "BBBBBBBBBB";
 
     @Autowired
+    private AnalysisRepository analysisRepository;
+
+    @Autowired
     private PartOfSpeechRepository partOfSpeechRepository;
 
     @Autowired
@@ -59,26 +67,31 @@ public class PartOfSpeechResourceIT {
     @Autowired
     private MockMvc restPartOfSpeechMockMvc;
 
+    private Analysis analysis;
     private PartOfSpeech partOfSpeech;
+
+    public static Analysis createAnalysisEntity() {
+        Analysis analysis = AnalysisResourceIT.createEntity();
+        analysis.setId(DEFAULT_ANALYSIS_ID);
+        analysis.setProjectId(DEFAULT_PROJECT_ID);
+        analysis.setTextId(DEFAULT_TEXT_ID);
+        return analysis;
+    }
 
     /**
      * Create an entity for this test.
      *
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
+     * @param analysis required entity
      */
-    public static PartOfSpeech createEntity() {
-        PartOfSpeech partOfSpeech = new PartOfSpeech()
+    public static PartOfSpeech createEntity(Analysis analysis) {
+        return new PartOfSpeech()
+            .analysis(analysis)
             .tag(DEFAULT_TAG)
             .start(DEFAULT_START)
             .size(DEFAULT_SIZE)
             .note(DEFAULT_NOTE);
-        // Add required entity
-        Analysis analysis;
-        analysis = AnalysisResourceIT.createEntity();
-        analysis.setId("fixed-id-for-tests");
-        partOfSpeech.setAnalysis(analysis);
-        return partOfSpeech;
     }
     /**
      * Create an updated entity for this test.
@@ -86,24 +99,21 @@ public class PartOfSpeechResourceIT {
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
      */
-    public static PartOfSpeech createUpdatedEntity() {
-        PartOfSpeech partOfSpeech = new PartOfSpeech()
+    public static PartOfSpeech createUpdatedEntity(Analysis analysis) {
+        return new PartOfSpeech()
+            .analysis(analysis)
             .tag(UPDATED_TAG)
             .start(UPDATED_START)
             .size(UPDATED_SIZE)
             .note(UPDATED_NOTE);
-        // Add required entity
-        Analysis analysis;
-        analysis = AnalysisResourceIT.createUpdatedEntity();
-        analysis.setId("fixed-id-for-tests");
-        partOfSpeech.setAnalysis(analysis);
-        return partOfSpeech;
     }
 
     @BeforeEach
     public void initTest() {
+        analysisRepository.deleteAll();
         partOfSpeechRepository.deleteAll();
-        partOfSpeech = createEntity();
+        analysis = analysisRepository.save(createAnalysisEntity());
+        partOfSpeech = createEntity(analysis);
     }
 
     @Test
@@ -111,10 +121,12 @@ public class PartOfSpeechResourceIT {
         int databaseSizeBeforeCreate = partOfSpeechRepository.findAll().size();
         // Create the PartOfSpeech
         PartOfSpeechDTO partOfSpeechDTO = partOfSpeechMapper.toDto(partOfSpeech);
-        restPartOfSpeechMockMvc.perform(post("/api/part-of-speeches").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO)))
-            .andExpect(status().isCreated());
+        restPartOfSpeechMockMvc.perform(
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
+        ).andExpect(status().isCreated());
 
         // Validate the PartOfSpeech in the database
         List<PartOfSpeech> partOfSpeechList = partOfSpeechRepository.findAll();
@@ -135,10 +147,12 @@ public class PartOfSpeechResourceIT {
         PartOfSpeechDTO partOfSpeechDTO = partOfSpeechMapper.toDto(partOfSpeech);
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        restPartOfSpeechMockMvc.perform(post("/api/part-of-speeches").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO)))
-            .andExpect(status().isBadRequest());
+        restPartOfSpeechMockMvc.perform(
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
+        ).andExpect(status().isBadRequest());
 
         // Validate the PartOfSpeech in the database
         List<PartOfSpeech> partOfSpeechList = partOfSpeechRepository.findAll();
@@ -156,10 +170,12 @@ public class PartOfSpeechResourceIT {
         PartOfSpeechDTO partOfSpeechDTO = partOfSpeechMapper.toDto(partOfSpeech);
 
 
-        restPartOfSpeechMockMvc.perform(post("/api/part-of-speeches").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO)))
-            .andExpect(status().isBadRequest());
+        restPartOfSpeechMockMvc.perform(
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
+        ).andExpect(status().isBadRequest());
 
         List<PartOfSpeech> partOfSpeechList = partOfSpeechRepository.findAll();
         assertThat(partOfSpeechList).hasSize(databaseSizeBeforeTest);
@@ -175,10 +191,12 @@ public class PartOfSpeechResourceIT {
         PartOfSpeechDTO partOfSpeechDTO = partOfSpeechMapper.toDto(partOfSpeech);
 
 
-        restPartOfSpeechMockMvc.perform(post("/api/part-of-speeches").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO)))
-            .andExpect(status().isBadRequest());
+        restPartOfSpeechMockMvc.perform(
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
+        ).andExpect(status().isBadRequest());
 
         List<PartOfSpeech> partOfSpeechList = partOfSpeechRepository.findAll();
         assertThat(partOfSpeechList).hasSize(databaseSizeBeforeTest);
@@ -193,11 +211,12 @@ public class PartOfSpeechResourceIT {
         // Create the PartOfSpeech, which fails.
         PartOfSpeechDTO partOfSpeechDTO = partOfSpeechMapper.toDto(partOfSpeech);
 
-
-        restPartOfSpeechMockMvc.perform(post("/api/part-of-speeches").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO)))
-            .andExpect(status().isBadRequest());
+        restPartOfSpeechMockMvc.perform(
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
+        ).andExpect(status().isBadRequest());
 
         List<PartOfSpeech> partOfSpeechList = partOfSpeechRepository.findAll();
         assertThat(partOfSpeechList).hasSize(databaseSizeBeforeTest);
@@ -209,7 +228,9 @@ public class PartOfSpeechResourceIT {
         partOfSpeechRepository.save(partOfSpeech);
 
         // Get all the partOfSpeechList
-        restPartOfSpeechMockMvc.perform(get("/api/part-of-speeches?sort=id,desc"))
+        restPartOfSpeechMockMvc.perform(
+            get("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches?sort=id,desc", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+        )
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(partOfSpeech.getId())))
@@ -218,14 +239,16 @@ public class PartOfSpeechResourceIT {
             .andExpect(jsonPath("$.[*].size").value(hasItem(DEFAULT_SIZE)))
             .andExpect(jsonPath("$.[*].note").value(hasItem(DEFAULT_NOTE)));
     }
-    
+
     @Test
     public void getPartOfSpeech() throws Exception {
         // Initialize the database
         partOfSpeechRepository.save(partOfSpeech);
 
         // Get the partOfSpeech
-        restPartOfSpeechMockMvc.perform(get("/api/part-of-speeches/{id}", partOfSpeech.getId()))
+        restPartOfSpeechMockMvc.perform(
+            get("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches/{id}", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID, partOfSpeech.getId())
+        )
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(partOfSpeech.getId()))
@@ -237,7 +260,9 @@ public class PartOfSpeechResourceIT {
     @Test
     public void getNonExistingPartOfSpeech() throws Exception {
         // Get the partOfSpeech
-        restPartOfSpeechMockMvc.perform(get("/api/part-of-speeches/{id}", Long.MAX_VALUE))
+        restPartOfSpeechMockMvc.perform(
+            get("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches/{id}", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID, Long.MAX_VALUE)
+        )
             .andExpect(status().isNotFound());
     }
 
@@ -257,10 +282,12 @@ public class PartOfSpeechResourceIT {
             .note(UPDATED_NOTE);
         PartOfSpeechDTO partOfSpeechDTO = partOfSpeechMapper.toDto(updatedPartOfSpeech);
 
-        restPartOfSpeechMockMvc.perform(put("/api/part-of-speeches").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO)))
-            .andExpect(status().isOk());
+        restPartOfSpeechMockMvc.perform(
+            put("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
+        ).andExpect(status().isOk());
 
         // Validate the PartOfSpeech in the database
         List<PartOfSpeech> partOfSpeechList = partOfSpeechRepository.findAll();
@@ -280,10 +307,12 @@ public class PartOfSpeechResourceIT {
         PartOfSpeechDTO partOfSpeechDTO = partOfSpeechMapper.toDto(partOfSpeech);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restPartOfSpeechMockMvc.perform(put("/api/part-of-speeches").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO)))
-            .andExpect(status().isBadRequest());
+        restPartOfSpeechMockMvc.perform(
+            put("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
+        ).andExpect(status().isBadRequest());
 
         // Validate the PartOfSpeech in the database
         List<PartOfSpeech> partOfSpeechList = partOfSpeechRepository.findAll();
@@ -298,9 +327,11 @@ public class PartOfSpeechResourceIT {
         int databaseSizeBeforeDelete = partOfSpeechRepository.findAll().size();
 
         // Delete the partOfSpeech
-        restPartOfSpeechMockMvc.perform(delete("/api/part-of-speeches/{id}", partOfSpeech.getId()).with(csrf())
-            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNoContent());
+        restPartOfSpeechMockMvc.perform(
+            delete("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches/{id}", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID, partOfSpeech.getId())
+                .with(csrf())
+                .accept(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isNoContent());
 
         // Validate the database contains one less item
         List<PartOfSpeech> partOfSpeechList = partOfSpeechRepository.findAll();

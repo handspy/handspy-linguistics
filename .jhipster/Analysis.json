@@ -23,8 +23,8 @@
     {
       "relationshipType": "one-to-one",
       "otherEntityName": "numericalStatistics",
-      "otherEntityRelationshipName": "analysisId",
-      "relationshipName": "id",
+      "otherEntityRelationshipName": "analysis",
+      "relationshipName": "numericalStatistics",
       "otherEntityField": "id",
       "ownerSide": true
     },
@@ -63,7 +63,7 @@
   "fluentMethods": true,
   "readOnly": false,
   "embedded": false,
-  "clientRootFolder": "",
+  "clientRootFolder": "linguistics",
   "applications": ["linguistics"],
   "microserviceName": "linguistics"
 }

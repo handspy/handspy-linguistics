@@ -4,6 +4,7 @@ import pt.up.hs.linguistics.LinguisticsApp;
 import pt.up.hs.linguistics.config.SecurityBeanOverrideConfiguration;
 import pt.up.hs.linguistics.domain.Emotion;
 import pt.up.hs.linguistics.domain.Analysis;
+import pt.up.hs.linguistics.repository.AnalysisRepository;
 import pt.up.hs.linguistics.repository.EmotionRepository;
 import pt.up.hs.linguistics.service.EmotionService;
 import pt.up.hs.linguistics.service.dto.EmotionDTO;
@@ -29,16 +30,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import pt.up.hs.linguistics.domain.enumeration.PrimaryEmotion;
 import pt.up.hs.linguistics.domain.enumeration.SecondaryEmotion;
 import pt.up.hs.linguistics.domain.enumeration.TertiaryEmotion;
+
 /**
  * Integration tests for the {@link EmotionResource} REST controller.
  */
-@SpringBootTest(classes = { SecurityBeanOverrideConfiguration.class, LinguisticsApp.class })
+@SpringBootTest(classes = {SecurityBeanOverrideConfiguration.class, LinguisticsApp.class})
 @AutoConfigureMockMvc
 @WithMockUser
 public class EmotionResourceIT {
 
+    private static final Long DEFAULT_PROJECT_ID = 1L;
+    private static final Long DEFAULT_TEXT_ID = 1001L;
+    private static final String DEFAULT_ANALYSIS_ID = "fixed-id-for-tests";
+
     private static final PrimaryEmotion DEFAULT_PRIMARY = PrimaryEmotion.SAFETY;
-    private static final PrimaryEmotion UPDATED_PRIMARY = PrimaryEmotion.WELL_BEING;
+    private static final PrimaryEmotion UPDATED_PRIMARY = PrimaryEmotion.COMFORT;
 
     private static final SecondaryEmotion DEFAULT_SECONDARY = SecondaryEmotion.COURAGE;
     private static final SecondaryEmotion UPDATED_SECONDARY = SecondaryEmotion.CALM;
@@ -56,6 +62,9 @@ public class EmotionResourceIT {
     private static final String UPDATED_NOTE = "BBBBBBBBBB";
 
     @Autowired
+    private AnalysisRepository analysisRepository;
+
+    @Autowired
     private EmotionRepository emotionRepository;
 
     @Autowired
@@ -67,55 +76,59 @@ public class EmotionResourceIT {
     @Autowired
     private MockMvc restEmotionMockMvc;
 
+    private Analysis analysis;
     private Emotion emotion;
+
+    public static Analysis createAnalysisEntity() {
+        Analysis analysis = AnalysisResourceIT.createEntity();
+        analysis.setId(DEFAULT_ANALYSIS_ID);
+        analysis.setProjectId(DEFAULT_PROJECT_ID);
+        analysis.setTextId(DEFAULT_TEXT_ID);
+        return analysis;
+    }
 
     /**
      * Create an entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
+     * @param analysis required entity
      */
-    public static Emotion createEntity() {
-        Emotion emotion = new Emotion()
+    public static Emotion createEntity(Analysis analysis) {
+        return new Emotion()
+            .analysis(analysis)
             .primary(DEFAULT_PRIMARY)
             .secondary(DEFAULT_SECONDARY)
             .tertiary(DEFAULT_TERTIARY)
             .start(DEFAULT_START)
             .size(DEFAULT_SIZE)
             .note(DEFAULT_NOTE);
-        // Add required entity
-        Analysis analysis;
-        analysis = AnalysisResourceIT.createEntity();
-        analysis.setId("fixed-id-for-tests");
-        emotion.setAnalysis(analysis);
-        return emotion;
     }
+
     /**
      * Create an updated entity for this test.
-     *
+     * <p>
      * This is a static method, as tests for other entities might also need it,
      * if they test an entity which requires the current entity.
+     * @param analysis required entity
      */
-    public static Emotion createUpdatedEntity() {
-        Emotion emotion = new Emotion()
+    public static Emotion createUpdatedEntity(Analysis analysis) {
+        return new Emotion()
+            .analysis(analysis)
             .primary(UPDATED_PRIMARY)
             .secondary(UPDATED_SECONDARY)
             .tertiary(UPDATED_TERTIARY)
             .start(UPDATED_START)
             .size(UPDATED_SIZE)
             .note(UPDATED_NOTE);
-        // Add required entity
-        Analysis analysis;
-        analysis = AnalysisResourceIT.createUpdatedEntity();
-        analysis.setId("fixed-id-for-tests");
-        emotion.setAnalysis(analysis);
-        return emotion;
     }
 
     @BeforeEach
     public void initTest() {
+        analysisRepository.deleteAll();
         emotionRepository.deleteAll();
-        emotion = createEntity();
+        analysis = analysisRepository.save(createAnalysisEntity());
+        emotion = createEntity(analysis);
     }
 
     @Test
@@ -123,9 +136,11 @@ public class EmotionResourceIT {
         int databaseSizeBeforeCreate = emotionRepository.findAll().size();
         // Create the Emotion
         EmotionDTO emotionDTO = emotionMapper.toDto(emotion);
-        restEmotionMockMvc.perform(post("/api/emotions").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(emotionDTO)))
+        restEmotionMockMvc.perform(
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/emotions", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(emotionDTO)))
             .andExpect(status().isCreated());
 
         // Validate the Emotion in the database
@@ -149,9 +164,11 @@ public class EmotionResourceIT {
         EmotionDTO emotionDTO = emotionMapper.toDto(emotion);
 
         // An entity with an existing ID cannot be created, so this API call must fail
-        restEmotionMockMvc.perform(post("/api/emotions").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(emotionDTO)))
+        restEmotionMockMvc.perform(
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/emotions", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(emotionDTO)))
             .andExpect(status().isBadRequest());
 
         // Validate the Emotion in the database
@@ -170,9 +187,11 @@ public class EmotionResourceIT {
         EmotionDTO emotionDTO = emotionMapper.toDto(emotion);
 
 
-        restEmotionMockMvc.perform(post("/api/emotions").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(emotionDTO)))
+        restEmotionMockMvc.perform(
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/emotions", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(emotionDTO)))
             .andExpect(status().isBadRequest());
 
         List<Emotion> emotionList = emotionRepository.findAll();
@@ -189,9 +208,11 @@ public class EmotionResourceIT {
         EmotionDTO emotionDTO = emotionMapper.toDto(emotion);
 
 
-        restEmotionMockMvc.perform(post("/api/emotions").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(emotionDTO)))
+        restEmotionMockMvc.perform(
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/emotions", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(emotionDTO)))
             .andExpect(status().isBadRequest());
 
         List<Emotion> emotionList = emotionRepository.findAll();
@@ -208,10 +229,12 @@ public class EmotionResourceIT {
         EmotionDTO emotionDTO = emotionMapper.toDto(emotion);
 
 
-        restEmotionMockMvc.perform(post("/api/emotions").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(emotionDTO)))
-            .andExpect(status().isBadRequest());
+        restEmotionMockMvc.perform(
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/emotions", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(emotionDTO))
+        ).andExpect(status().isBadRequest());
 
         List<Emotion> emotionList = emotionRepository.findAll();
         assertThat(emotionList).hasSize(databaseSizeBeforeTest);
@@ -223,7 +246,9 @@ public class EmotionResourceIT {
         emotionRepository.save(emotion);
 
         // Get all the emotionList
-        restEmotionMockMvc.perform(get("/api/emotions?sort=id,desc"))
+        restEmotionMockMvc.perform(
+            get("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/emotions?sort=id,desc", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+        )
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.[*].id").value(hasItem(emotion.getId())))
@@ -234,14 +259,16 @@ public class EmotionResourceIT {
             .andExpect(jsonPath("$.[*].size").value(hasItem(DEFAULT_SIZE)))
             .andExpect(jsonPath("$.[*].note").value(hasItem(DEFAULT_NOTE)));
     }
-    
+
     @Test
     public void getEmotion() throws Exception {
         // Initialize the database
         emotionRepository.save(emotion);
 
         // Get the emotion
-        restEmotionMockMvc.perform(get("/api/emotions/{id}", emotion.getId()))
+        restEmotionMockMvc.perform(
+            get("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/emotions/{id}", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID, emotion.getId())
+        )
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
             .andExpect(jsonPath("$.id").value(emotion.getId()))
@@ -252,11 +279,13 @@ public class EmotionResourceIT {
             .andExpect(jsonPath("$.size").value(DEFAULT_SIZE))
             .andExpect(jsonPath("$.note").value(DEFAULT_NOTE));
     }
+
     @Test
     public void getNonExistingEmotion() throws Exception {
         // Get the emotion
-        restEmotionMockMvc.perform(get("/api/emotions/{id}", Long.MAX_VALUE))
-            .andExpect(status().isNotFound());
+        restEmotionMockMvc.perform(
+            get("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/emotions/{id}", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID, Long.MAX_VALUE)
+        ).andExpect(status().isNotFound());
     }
 
     @Test
@@ -277,10 +306,12 @@ public class EmotionResourceIT {
             .note(UPDATED_NOTE);
         EmotionDTO emotionDTO = emotionMapper.toDto(updatedEmotion);
 
-        restEmotionMockMvc.perform(put("/api/emotions").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(emotionDTO)))
-            .andExpect(status().isOk());
+        restEmotionMockMvc.perform(
+            put("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/emotions", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(emotionDTO))
+        ).andExpect(status().isOk());
 
         // Validate the Emotion in the database
         List<Emotion> emotionList = emotionRepository.findAll();
@@ -302,10 +333,12 @@ public class EmotionResourceIT {
         EmotionDTO emotionDTO = emotionMapper.toDto(emotion);
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
-        restEmotionMockMvc.perform(put("/api/emotions").with(csrf())
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(TestUtil.convertObjectToJsonBytes(emotionDTO)))
-            .andExpect(status().isBadRequest());
+        restEmotionMockMvc.perform(
+            put("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/emotions", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+                .with(csrf())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtil.convertObjectToJsonBytes(emotionDTO))
+        ).andExpect(status().isBadRequest());
 
         // Validate the Emotion in the database
         List<Emotion> emotionList = emotionRepository.findAll();
@@ -320,9 +353,10 @@ public class EmotionResourceIT {
         int databaseSizeBeforeDelete = emotionRepository.findAll().size();
 
         // Delete the emotion
-        restEmotionMockMvc.perform(delete("/api/emotions/{id}", emotion.getId()).with(csrf())
-            .accept(MediaType.APPLICATION_JSON))
-            .andExpect(status().isNoContent());
+        restEmotionMockMvc.perform(
+            delete("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/emotions/{id}", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID, emotion.getId()).with(csrf())
+                .accept(MediaType.APPLICATION_JSON)
+        ).andExpect(status().isNoContent());
 
         // Validate the database contains one less item
         List<Emotion> emotionList = emotionRepository.findAll();

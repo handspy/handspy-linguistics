@@ -11,33 +11,54 @@ import java.util.Optional;
 public interface AnalysisService {
 
     /**
-     * Save a analysis.
+     * Perform linguistic analysis and save its result merged with
+     * provided {@link AnalysisDTO} entity.
      *
+     * @param projectId   ID of the project to which the analysis belongs.
+     * @param textId      ID of the protocol to which the analysis belongs.
      * @param analysisDTO the entity to save.
      * @return the persisted entity.
      */
-    AnalysisDTO save(AnalysisDTO analysisDTO);
+    AnalysisDTO analyze(
+        Long projectId, Long textId,
+        AnalysisDTO analysisDTO
+    );
+
+    /**
+     * Save a analysis.
+     *
+     * @param projectId   ID of the project to which the analysis belongs.
+     * @param textId      ID of the text to which the analysis belongs.
+     * @param analysisDTO the entity to save.
+     * @return the persisted entity.
+     */
+    AnalysisDTO save(Long projectId, Long textId, AnalysisDTO analysisDTO);
 
     /**
      * Get all the analyses.
      *
+     * @param projectId ID of the project to which the analysis belongs.
+     * @param textId    ID of the text to which the analysis belongs.
      * @return the list of entities.
      */
-    List<AnalysisDTO> findAll();
-
+    List<AnalysisDTO> findAll(Long projectId, Long textId);
 
     /**
      * Get the "id" analysis.
      *
-     * @param id the id of the entity.
+     * @param projectId ID of the project to which the analysis belongs.
+     * @param textId    ID of the text to which the analysis belongs.
+     * @param id        the id of the entity.
      * @return the entity.
      */
-    Optional<AnalysisDTO> findOne(String id);
+    Optional<AnalysisDTO> findOne(Long projectId, Long textId, String id);
 
     /**
      * Delete the "id" analysis.
      *
-     * @param id the id of the entity.
+     * @param projectId ID of the project to which the analysis belongs.
+     * @param textId    ID of the text to which the analysis belongs.
+     * @param id        the id of the entity.
      */
-    void delete(String id);
+    void delete(Long projectId, Long textId, String id);
 }

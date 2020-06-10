@@ -44,6 +44,12 @@ public class PartOfSpeech implements Serializable {
     private Integer size;
 
     /**
+     * Lemma of the word.
+     */
+    @Field("lemma")
+    private String lemma;
+
+    /**
      * Note about tag
      */
     @Field("note")
@@ -102,6 +108,19 @@ public class PartOfSpeech implements Serializable {
         this.size = size;
     }
 
+    public String getLemma() {
+        return lemma;
+    }
+
+    public PartOfSpeech lemma(String lemma) {
+        this.lemma = lemma;
+        return this;
+    }
+
+    public void setLemma(String lemma) {
+        this.lemma = lemma;
+    }
+
     public String getNote() {
         return note;
     }
@@ -149,11 +168,13 @@ public class PartOfSpeech implements Serializable {
     @Override
     public String toString() {
         return "PartOfSpeech{" +
-            "id=" + getId() +
-            ", tag='" + getTag() + "'" +
-            ", start=" + getStart() +
-            ", size=" + getSize() +
-            ", note='" + getNote() + "'" +
-            "}";
+            "id='" + id + '\'' +
+            ", tag=" + tag +
+            ", start=" + start +
+            ", size=" + size +
+            ", lemma='" + lemma + '\'' +
+            ", note='" + note + '\'' +
+            ", analysis=" + analysis +
+            '}';
     }
 }

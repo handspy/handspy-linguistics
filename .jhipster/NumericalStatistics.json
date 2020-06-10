@@ -71,16 +71,8 @@
       "relationshipType": "one-to-one",
       "otherEntityName": "analysis",
       "otherEntityRelationshipName": "numericalStatistics",
-      "relationshipName": "analysis",
-      "otherEntityField": "id",
-      "ownerSide": true
-    },
-    {
-      "relationshipType": "one-to-one",
-      "otherEntityName": "analysis",
-      "otherEntityRelationshipName": "id",
       "relationshipValidateRules": "required",
-      "relationshipName": "analysisId",
+      "relationshipName": "analysis",
       "ownerSide": false
     }
   ],
@@ -94,7 +86,7 @@
   "fluentMethods": true,
   "readOnly": false,
   "embedded": false,
-  "clientRootFolder": "",
+  "clientRootFolder": "linguistics",
   "applications": ["linguistics"],
   "microserviceName": "linguistics"
 }

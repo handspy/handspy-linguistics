@@ -63,7 +63,7 @@ class LinguisticsKafkaResourceIT {
         restMockMvc = MockMvcBuilders.standaloneSetup(kafkaResource).build();
     }
 
-    @Test
+    /*@Test*/
     void producesMessages() throws Exception {
         restMockMvc.perform(post("/api/linguistics-kafka/publish/topic-produce?message=value-produce"))
             .andExpect(status().isOk())
@@ -79,7 +79,7 @@ class LinguisticsKafkaResourceIT {
         assertThat(record.value()).isEqualTo("value-produce");
     }
 
-    @Test
+    /*@Test*/
     void consumesMessages() throws Exception {
         Map<String, Object> producerProps = new HashMap<>(getProducerProps());
         KafkaProducer<String, String> producer = new KafkaProducer<>(producerProps);

@@ -1,28 +1,65 @@
 package pt.up.hs.linguistics.service.dto;
 
 import io.swagger.annotations.ApiModel;
-import java.io.Serializable;
 import pt.up.hs.linguistics.domain.enumeration.Status;
+
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A DTO for the {@link pt.up.hs.linguistics.domain.Analysis} entity.
+ *
+ * @author José Carlos Paiva
  */
-@ApiModel(description = "Linguistic analysis conducted in a text.\n\n@author José Carlos Paiva")
-public class AnalysisDTO implements Serializable {
-    
+@ApiModel(description = "Linguistic analysis conducted in a text.")
+public class AnalysisDTO extends AbstractAuditingDTO {
+
     private String id;
 
-    private Long textId;
+    private Long projectId;
 
-    private String text;
+    private Long textId;
 
     private String language;
 
     private Status status;
 
+    private Integer characterCount;
+    private Integer nonBlankCharacterCount;
 
-    private String idId;
-    
+    private Integer wordCount;
+    private Integer distinctWordCount;
+    private Integer functionalWordCount;
+    private Integer distinctFunctionalWordCount;
+    private Integer contentWordCount;
+    private Integer distinctContentWordCount;
+
+    private Integer distinctLemmaCount;
+
+    private Double wordAvgLength;
+    private Double functionalWordAvgLength;
+    private Double contentWordAvgLength;
+
+    private Integer sentenceCount;
+
+    private Double lexicalDensity;
+
+    private Double baseTTR;
+    private Double hdd;
+    private Double mtld;
+    private Double vocd;
+
+    private Map<String, Set<String>> wordsByCategory;
+    private Map<String, Integer> contentWordFrequencies;
+    private Map<String, Integer> functionalWordFrequencies;
+    private Map<String, Integer> lemmaFrequencies;
+
+    private Map<String, Double> coOccurrences;
+
+    private Set<EmotionDTO> emotions;
+
+    private Set<PartOfSpeechDTO> partsOfSpeech;
+
     public String getId() {
         return id;
     }
@@ -31,20 +68,20 @@ public class AnalysisDTO implements Serializable {
         this.id = id;
     }
 
+    public Long getProjectId() {
+        return projectId;
+    }
+
+    public void setProjectId(Long projectId) {
+        this.projectId = projectId;
+    }
+
     public Long getTextId() {
         return textId;
     }
 
     public void setTextId(Long textId) {
         this.textId = textId;
-    }
-
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
     }
 
     public String getLanguage() {
@@ -63,12 +100,204 @@ public class AnalysisDTO implements Serializable {
         this.status = status;
     }
 
-    public String getIdId() {
-        return idId;
+    public Integer getCharacterCount() {
+        return characterCount;
     }
 
-    public void setIdId(String numericalStatisticsId) {
-        this.idId = numericalStatisticsId;
+    public void setCharacterCount(Integer characterCount) {
+        this.characterCount = characterCount;
+    }
+
+    public Integer getNonBlankCharacterCount() {
+        return nonBlankCharacterCount;
+    }
+
+    public void setNonBlankCharacterCount(Integer nonBlankCharacterCount) {
+        this.nonBlankCharacterCount = nonBlankCharacterCount;
+    }
+
+    public Integer getWordCount() {
+        return wordCount;
+    }
+
+    public void setWordCount(Integer wordCount) {
+        this.wordCount = wordCount;
+    }
+
+    public Integer getDistinctWordCount() {
+        return distinctWordCount;
+    }
+
+    public void setDistinctWordCount(Integer distinctWordCount) {
+        this.distinctWordCount = distinctWordCount;
+    }
+
+    public Integer getFunctionalWordCount() {
+        return functionalWordCount;
+    }
+
+    public void setFunctionalWordCount(Integer functionalWordCount) {
+        this.functionalWordCount = functionalWordCount;
+    }
+
+    public Integer getDistinctFunctionalWordCount() {
+        return distinctFunctionalWordCount;
+    }
+
+    public void setDistinctFunctionalWordCount(Integer distinctFunctionalWordCount) {
+        this.distinctFunctionalWordCount = distinctFunctionalWordCount;
+    }
+
+    public Integer getContentWordCount() {
+        return contentWordCount;
+    }
+
+    public void setContentWordCount(Integer contentWordCount) {
+        this.contentWordCount = contentWordCount;
+    }
+
+    public Integer getDistinctContentWordCount() {
+        return distinctContentWordCount;
+    }
+
+    public void setDistinctContentWordCount(Integer distinctContentWordCount) {
+        this.distinctContentWordCount = distinctContentWordCount;
+    }
+
+    public Integer getDistinctLemmaCount() {
+        return distinctLemmaCount;
+    }
+
+    public void setDistinctLemmaCount(Integer distinctLemmaCount) {
+        this.distinctLemmaCount = distinctLemmaCount;
+    }
+
+    public Double getWordAvgLength() {
+        return wordAvgLength;
+    }
+
+    public void setWordAvgLength(Double wordAvgLength) {
+        this.wordAvgLength = wordAvgLength;
+    }
+
+    public Double getFunctionalWordAvgLength() {
+        return functionalWordAvgLength;
+    }
+
+    public void setFunctionalWordAvgLength(Double functionalWordAvgLength) {
+        this.functionalWordAvgLength = functionalWordAvgLength;
+    }
+
+    public Double getContentWordAvgLength() {
+        return contentWordAvgLength;
+    }
+
+    public void setContentWordAvgLength(Double contentWordAvgLength) {
+        this.contentWordAvgLength = contentWordAvgLength;
+    }
+
+    public Integer getSentenceCount() {
+        return sentenceCount;
+    }
+
+    public void setSentenceCount(Integer sentenceCount) {
+        this.sentenceCount = sentenceCount;
+    }
+
+    public Double getLexicalDensity() {
+        return lexicalDensity;
+    }
+
+    public void setLexicalDensity(Double lexicalDensity) {
+        this.lexicalDensity = lexicalDensity;
+    }
+
+    public Double getBaseTTR() {
+        return baseTTR;
+    }
+
+    public void setBaseTTR(Double baseTTR) {
+        this.baseTTR = baseTTR;
+    }
+
+    public Double getHdd() {
+        return hdd;
+    }
+
+    public void setHdd(Double hdd) {
+        this.hdd = hdd;
+    }
+
+    public Double getMtld() {
+        return mtld;
+    }
+
+    public void setMtld(Double mtld) {
+        this.mtld = mtld;
+    }
+
+    public Double getVocd() {
+        return vocd;
+    }
+
+    public void setVocd(Double vocd) {
+        this.vocd = vocd;
+    }
+
+    public Map<String, Set<String>> getWordsByCategory() {
+        return wordsByCategory;
+    }
+
+    public void setWordsByCategory(Map<String, Set<String>> wordsByCategory) {
+        this.wordsByCategory = wordsByCategory;
+    }
+
+    public Map<String, Integer> getContentWordFrequencies() {
+        return contentWordFrequencies;
+    }
+
+    public void setContentWordFrequencies(Map<String, Integer> contentWordFrequencies) {
+        this.contentWordFrequencies = contentWordFrequencies;
+    }
+
+    public Map<String, Integer> getFunctionalWordFrequencies() {
+        return functionalWordFrequencies;
+    }
+
+    public void setFunctionalWordFrequencies(Map<String, Integer> functionalWordFrequencies) {
+        this.functionalWordFrequencies = functionalWordFrequencies;
+    }
+
+    public Map<String, Integer> getLemmaFrequencies() {
+        return lemmaFrequencies;
+    }
+
+    public void setLemmaFrequencies(Map<String, Integer> lemmaFrequencies) {
+        this.lemmaFrequencies = lemmaFrequencies;
+    }
+
+    public Map<String, Double> getCoOccurrences() {
+        return coOccurrences;
+    }
+
+    public void setCoOccurrences(Map<String, Double> coOccurrences) {
+        this.coOccurrences = coOccurrences;
+    }
+
+    public Set<EmotionDTO> getEmotions() {
+        return emotions;
+    }
+
+    public void setEmotions(Set<EmotionDTO> emotions) {
+        this.emotions = emotions;
+    }
+
+    public Set<PartOfSpeechDTO> getPartsOfSpeech() {
+        return partsOfSpeech;
+    }
+
+    public void setPartsOfSpeech(Set<PartOfSpeechDTO> partsOfSpeech) {
+        this.partsOfSpeech = partsOfSpeech;
     }
 
     @Override
@@ -92,12 +321,36 @@ public class AnalysisDTO implements Serializable {
     @Override
     public String toString() {
         return "AnalysisDTO{" +
-            "id=" + getId() +
-            ", textId=" + getTextId() +
-            ", text='" + getText() + "'" +
-            ", language='" + getLanguage() + "'" +
-            ", status='" + getStatus() + "'" +
-            ", idId='" + getIdId() + "'" +
-            "}";
+            "id='" + id + '\'' +
+            ", projectId=" + projectId +
+            ", textId=" + textId +
+            ", language='" + language + '\'' +
+            ", status=" + status +
+            ", characterCount=" + characterCount +
+            ", nonBlankCharacterCount=" + nonBlankCharacterCount +
+            ", wordCount=" + wordCount +
+            ", distinctWordCount=" + distinctWordCount +
+            ", functionalWordCount=" + functionalWordCount +
+            ", distinctFunctionalWordCount=" + distinctFunctionalWordCount +
+            ", contentWordCount=" + contentWordCount +
+            ", distinctContentWordCount=" + distinctContentWordCount +
+            ", distinctLemmaCount=" + distinctLemmaCount +
+            ", wordAvgLength=" + wordAvgLength +
+            ", functionalWordAvgLength=" + functionalWordAvgLength +
+            ", contentWordAvgLength=" + contentWordAvgLength +
+            ", sentenceCount=" + sentenceCount +
+            ", lexicalDensity=" + lexicalDensity +
+            ", baseTTR=" + baseTTR +
+            ", hdd=" + hdd +
+            ", mtld=" + mtld +
+            ", vocd=" + vocd +
+            ", wordsByCategory=" + wordsByCategory +
+            ", contentWordFrequencies=" + contentWordFrequencies +
+            ", functionalWordFrequencies=" + functionalWordFrequencies +
+            ", lemmaFrequencies=" + lemmaFrequencies +
+            ", coOccurrences=" + coOccurrences +
+            ", emotions=" + emotions +
+            ", partsOfSpeech=" + partsOfSpeech +
+            '}';
     }
 }

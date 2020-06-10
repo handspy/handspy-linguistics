@@ -111,6 +111,7 @@ task integrationTest(type: Test) {
         events 'FAILED', 'SKIPPED'
     }
 
+    maxHeapSize = "2G"
 
     // uncomment if the tests reports are not generated
     // see https://github.com/jhipster/generator-jhipster/pull/2771 and https://github.com/jhipster/generator-jhipster/pull/4484
@@ -189,6 +190,7 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-logging"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-aop"
+    implementation "org.springframework.boot:spring-boot-starter-data-redis"
     implementation "org.springframework.boot:spring-boot-starter-data-mongodb"
     implementation "org.apache.kafka:kafka-clients"
     implementation "org.springframework.boot:spring-boot-starter-security"
@@ -219,6 +221,10 @@ dependencies {
     }
     implementation "io.springfox:springfox-bean-validators"
     implementation "org.mapstruct:mapstruct:${mapstruct_version}"
+    implementation "org.msgpack:msgpack-core:${msgpack_version}"
+    implementation "org.msgpack:jackson-dataformat-msgpack:${msgpack_version}"
+    implementation "org.xerial.snappy:snappy-java:${snappy_version}"
+    implementation "pt.up.hs:linguini:${linguini_version}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${spring_boot_version}"
     testImplementation ("org.springframework.boot:spring-boot-starter-test") {
@@ -229,7 +235,8 @@ dependencies {
     testImplementation "com.tngtech.archunit:archunit-junit5-api:${archunit_junit5_version}"
     testRuntimeOnly "com.tngtech.archunit:archunit-junit5-engine:${archunit_junit5_version}"
     testImplementation "de.flapdoodle.embed:de.flapdoodle.embed.mongo"
-    testImplementation "org.testcontainers:kafka"
+    testImplementation "org.testcontainers:testcontainers:${testcontainers_version}"
+    testImplementation "org.testcontainers:kafka:${testcontainers_version}"
     //jhipster-needle-gradle-dependency - JHipster will add additional dependencies here
 }
 

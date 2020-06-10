@@ -1,6 +1,5 @@
 package pt.up.hs.linguistics.service.mapper;
 
-
 import pt.up.hs.linguistics.domain.*;
 import pt.up.hs.linguistics.service.dto.AnalysisDTO;
 
@@ -9,17 +8,19 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Analysis} and its DTO {@link AnalysisDTO}.
  */
-@Mapper(componentModel = "spring", uses = {NumericalStatisticsMapper.class})
+@Mapper(componentModel = "spring", uses = {})
 public interface AnalysisMapper extends EntityMapper<AnalysisDTO, Analysis> {
 
-    @Mapping(source = "id.id", target = "idId")
+    @Mapping(target = "createdBy", ignore = true)
+    @Mapping(target = "createdDate", ignore = true)
+    @Mapping(target = "lastModifiedBy", ignore = true)
+    @Mapping(target = "lastModifiedDate", ignore = true)
     AnalysisDTO toDto(Analysis analysis);
 
-    @Mapping(source = "idId", target = "id")
-    @Mapping(target = "wordFrequencies", ignore = true)
-    @Mapping(target = "removeWordFrequency", ignore = true)
-    @Mapping(target = "lemmaFrequencies", ignore = true)
+    @Mapping(target = "removeContentWordFrequency", ignore = true)
+    @Mapping(target = "removeFunctionalWordFrequency", ignore = true)
     @Mapping(target = "removeLemmaFrequency", ignore = true)
+    @Mapping(target = "removeCoOccurrence", ignore = true)
     @Mapping(target = "emotions", ignore = true)
     @Mapping(target = "removeEmotion", ignore = true)
     @Mapping(target = "partOfSpeeches", ignore = true)

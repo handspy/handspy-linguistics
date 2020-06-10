@@ -21,6 +21,8 @@ import static org.assertj.core.api.Assertions.assertThat;
  */
 public final class TestUtil {
 
+    public static final Double EPSILON = 0.001;
+
     private static final ObjectMapper mapper = createObjectMapper();
 
     private static ObjectMapper createObjectMapper() {
