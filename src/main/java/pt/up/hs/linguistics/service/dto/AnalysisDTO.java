@@ -1,6 +1,7 @@
 package pt.up.hs.linguistics.service.dto;
 
 import io.swagger.annotations.ApiModel;
+import pt.up.hs.linguistics.domain.enumeration.PoSTag;
 import pt.up.hs.linguistics.domain.enumeration.Status;
 
 import java.util.Map;
@@ -15,13 +16,10 @@ import java.util.Set;
 public class AnalysisDTO extends AbstractAuditingDTO {
 
     private String id;
-
     private Long projectId;
-
     private Long textId;
 
     private String language;
-
     private Status status;
 
     private Integer characterCount;
@@ -49,7 +47,7 @@ public class AnalysisDTO extends AbstractAuditingDTO {
     private Double mtld;
     private Double vocd;
 
-    private Map<String, Set<String>> wordsByCategory;
+    private Map<PoSTag, Set<String>> wordsByCategory;
     private Map<String, Integer> contentWordFrequencies;
     private Map<String, Integer> functionalWordFrequencies;
     private Map<String, Integer> lemmaFrequencies;
@@ -244,11 +242,11 @@ public class AnalysisDTO extends AbstractAuditingDTO {
         this.vocd = vocd;
     }
 
-    public Map<String, Set<String>> getWordsByCategory() {
+    public Map<PoSTag, Set<String>> getWordsByCategory() {
         return wordsByCategory;
     }
 
-    public void setWordsByCategory(Map<String, Set<String>> wordsByCategory) {
+    public void setWordsByCategory(Map<PoSTag, Set<String>> wordsByCategory) {
         this.wordsByCategory = wordsByCategory;
     }
 

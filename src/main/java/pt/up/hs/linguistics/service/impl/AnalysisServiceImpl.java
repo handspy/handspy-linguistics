@@ -121,7 +121,10 @@ public class AnalysisServiceImpl implements AnalysisService {
                 .mtld(report.getMtld())
                 .vocd(report.getVocd())
 
-                .wordsByCategory(report.getWordsByCategory())
+                .wordsByCategory(report.getWordsByCategory().entrySet()
+                    .parallelStream()
+                    .collect(Collectors.toMap(e -> PoSTag.valueOf(e.getKey()), Map.Entry::getValue))
+                )
                 .contentWordFrequencies(report.getContentWordFrequency())
                 .functionalWordFrequencies(report.getFunctionalWordFrequency())
                 .lemmaFrequencies(report.getLemmaFrequency())

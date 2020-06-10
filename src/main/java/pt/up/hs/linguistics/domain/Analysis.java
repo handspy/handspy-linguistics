@@ -8,6 +8,7 @@ import org.springframework.data.mongodb.core.mapping.DBRef;
 import java.io.Serializable;
 import java.util.*;
 
+import pt.up.hs.linguistics.domain.enumeration.PoSTag;
 import pt.up.hs.linguistics.domain.enumeration.Status;
 
 /**
@@ -90,7 +91,7 @@ public class Analysis implements Serializable {
     private Double vocd;
 
     @Field("words_by_category")
-    private Map<String, Set<String>> wordsByCategory;
+    private Map<PoSTag, Set<String>> wordsByCategory;
 
     @Field("content_word_frequencies")
     private Map<String, Integer> contentWordFrequencies;
@@ -407,16 +408,16 @@ public class Analysis implements Serializable {
         this.vocd = vocd;
     }
 
-    public Map<String, Set<String>> getWordsByCategory() {
+    public Map<PoSTag, Set<String>> getWordsByCategory() {
         return wordsByCategory;
     }
 
-    public Analysis wordsByCategory(Map<String, Set<String>> wordsByCategory) {
+    public Analysis wordsByCategory(Map<PoSTag, Set<String>> wordsByCategory) {
         this.wordsByCategory = wordsByCategory;
         return this;
     }
 
-    public void setWordsByCategory(Map<String, Set<String>> wordsByCategory) {
+    public void setWordsByCategory(Map<PoSTag, Set<String>> wordsByCategory) {
         this.wordsByCategory = wordsByCategory;
     }
 
