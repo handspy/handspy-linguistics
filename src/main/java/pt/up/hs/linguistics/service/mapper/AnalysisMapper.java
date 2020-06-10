@@ -8,7 +8,7 @@ import org.mapstruct.*;
 /**
  * Mapper for the entity {@link Analysis} and its DTO {@link AnalysisDTO}.
  */
-@Mapper(componentModel = "spring", uses = {})
+@Mapper(componentModel = "spring", uses = {EmotionMapper.class, PartOfSpeechMapper.class})
 public interface AnalysisMapper extends EntityMapper<AnalysisDTO, Analysis> {
 
     @Mapping(target = "createdBy", ignore = true)
@@ -23,7 +23,7 @@ public interface AnalysisMapper extends EntityMapper<AnalysisDTO, Analysis> {
     @Mapping(target = "removeCoOccurrence", ignore = true)
     @Mapping(target = "emotions", ignore = true)
     @Mapping(target = "removeEmotion", ignore = true)
-    @Mapping(target = "partOfSpeeches", ignore = true)
+    @Mapping(target = "partsOfSpeech", ignore = true)
     @Mapping(target = "removePartOfSpeech", ignore = true)
     Analysis toEntity(AnalysisDTO analysisDTO);
 

@@ -155,7 +155,7 @@ public class AnalysisServiceImpl implements AnalysisService {
                 .collect(Collectors.toList());
 
             partOfSpeechRepository.saveAll(partsOfSpeech);
-            analysis.partOfSpeeches(new HashSet<>(partsOfSpeech));
+            analysis.partsOfSpeech(new HashSet<>(partsOfSpeech));
 
         } catch (LinguiniException e) {
             throw new ServiceException(

@@ -565,7 +565,7 @@ public class Analysis implements Serializable {
         return partsOfSpeech;
     }
 
-    public Analysis partOfSpeeches(Set<PartOfSpeech> partOfSpeeches) {
+    public Analysis partsOfSpeech(Set<PartOfSpeech> partOfSpeeches) {
         this.partsOfSpeech = partOfSpeeches;
         return this;
     }
