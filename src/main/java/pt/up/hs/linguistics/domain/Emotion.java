@@ -16,7 +16,9 @@ import pt.up.hs.linguistics.domain.enumeration.SecondaryEmotion;
 import pt.up.hs.linguistics.domain.enumeration.TertiaryEmotion;
 
 /**
- * An emotion present in the text.\n\n@author José Carlos Paiva
+ * An emotion present in the text.
+ *
+ * @author José Carlos Paiva
  */
 @Document(collection = "emotion")
 public class Emotion implements Serializable {

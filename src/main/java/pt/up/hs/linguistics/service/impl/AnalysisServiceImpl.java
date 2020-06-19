@@ -3,7 +3,6 @@ package pt.up.hs.linguistics.service.impl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 import pt.up.hs.linguini.Linguini;
 import pt.up.hs.linguini.analysis.cooccurrence.CoOccurrence;
 import pt.up.hs.linguini.exceptions.LinguiniException;
@@ -23,6 +22,7 @@ import pt.up.hs.linguistics.service.AnalysisService;
 import pt.up.hs.linguistics.service.dto.AnalysisDTO;
 import pt.up.hs.linguistics.service.exceptions.ServiceException;
 import pt.up.hs.linguistics.service.mapper.AnalysisMapper;
+import pt.up.hs.linguistics.utils.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -187,6 +187,10 @@ public class AnalysisServiceImpl implements AnalysisService {
         analysis.setProjectId(projectId);
         analysis.setTextId(textId);
         deleteOldAnalyses(projectId, textId, analysisDTO.getId(), false);
+        analysis
+            .partsOfSpeech(new HashSet<>(partOfSpeechRepository.saveAll(analysis.getPartsOfSpeech())));
+        analysis
+            .emotions(new HashSet<>(emotionRepository.saveAll(analysis.getEmotions())));
         analysis = analysisRepository.save(analysis);
         return analysisMapper.toDto(analysis);
     }
