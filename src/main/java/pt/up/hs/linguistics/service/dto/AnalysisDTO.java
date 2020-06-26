@@ -4,6 +4,7 @@ import io.swagger.annotations.ApiModel;
 import pt.up.hs.linguistics.domain.enumeration.PoSTag;
 import pt.up.hs.linguistics.domain.enumeration.Status;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -54,9 +55,11 @@ public class AnalysisDTO extends AbstractAuditingDTO {
 
     private Map<String, Double> coOccurrences;
 
-    private Set<EmotionDTO> emotions;
+    private Double ideaDensity;
 
-    private Set<PartOfSpeechDTO> partsOfSpeech;
+    private Set<EmotionDTO> emotions = new HashSet<>();
+
+    private Set<PartOfSpeechDTO> partsOfSpeech = new HashSet<>();
 
     public String getId() {
         return id;
@@ -282,6 +285,14 @@ public class AnalysisDTO extends AbstractAuditingDTO {
         this.coOccurrences = coOccurrences;
     }
 
+    public Double getIdeaDensity() {
+        return ideaDensity;
+    }
+
+    public void setIdeaDensity(Double ideaDensity) {
+        this.ideaDensity = ideaDensity;
+    }
+
     public Set<EmotionDTO> getEmotions() {
         return emotions;
     }
@@ -347,6 +358,7 @@ public class AnalysisDTO extends AbstractAuditingDTO {
             ", functionalWordFrequencies=" + functionalWordFrequencies +
             ", lemmaFrequencies=" + lemmaFrequencies +
             ", coOccurrences=" + coOccurrences +
+            ", ideaDensity=" + ideaDensity +
             ", emotions=" + emotions +
             ", partsOfSpeech=" + partsOfSpeech +
             '}';

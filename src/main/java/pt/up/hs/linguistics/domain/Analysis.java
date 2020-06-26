@@ -105,6 +105,9 @@ public class Analysis implements Serializable {
     @Field("cooccurrences")
     private Map<String, Double> coOccurrences;
 
+    @Field("idea_density")
+    private Double ideaDensity;
+
     @DBRef
     @Field("emotion")
     private Set<Emotion> emotions = new HashSet<>();
@@ -408,6 +411,19 @@ public class Analysis implements Serializable {
         this.vocd = vocd;
     }
 
+    public Double getIdeaDensity() {
+        return ideaDensity;
+    }
+
+    public Analysis ideaDensity(Double ideaDensity) {
+        this.ideaDensity = ideaDensity;
+        return this;
+    }
+
+    public void setIdeaDensity(Double ideaDensity) {
+        this.ideaDensity = ideaDensity;
+    }
+
     public Map<PoSTag, Set<String>> getWordsByCategory() {
         return wordsByCategory;
     }
@@ -543,6 +559,9 @@ public class Analysis implements Serializable {
 
     public Analysis emotions(Set<Emotion> emotions) {
         this.emotions = emotions;
+        if (emotions != null) {
+            emotions.parallelStream().forEach(emotion -> emotion.setAnalysis(this));
+        }
         return this;
     }
 
@@ -568,6 +587,9 @@ public class Analysis implements Serializable {
 
     public Analysis partsOfSpeech(Set<PartOfSpeech> partOfSpeeches) {
         this.partsOfSpeech = partOfSpeeches;
+        if (partOfSpeeches != null) {
+            partOfSpeeches.parallelStream().forEach(partOfSpeech -> partOfSpeech.setAnalysis(this));
+        }
         return this;
     }
 
@@ -636,6 +658,7 @@ public class Analysis implements Serializable {
             ", functionalWordFrequencies=" + functionalWordFrequencies +
             ", lemmaFrequencies=" + lemmaFrequencies +
             ", coOccurrences=" + coOccurrences +
+            ", ideaDensity=" + ideaDensity +
             ", emotions=" + emotions +
             ", partsOfSpeech=" + partsOfSpeech +
             '}';

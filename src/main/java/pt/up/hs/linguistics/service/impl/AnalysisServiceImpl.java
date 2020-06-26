@@ -133,16 +133,28 @@ public class AnalysisServiceImpl implements AnalysisService {
                     .collect(Collectors.toMap(
                         c -> c.getFirstWord() + "--" + c.getSecondWord(),
                         CoOccurrence::getValue
-                    )));
+                    )))
+
+                .ideaDensity(report.getIdeaDensity());
 
             List<Emotion> emotions = report.getEmotionalAnnotations()
                 .parallelStream()
                 .map(annot -> new Emotion()
                     .start(annot.getToken().getStart())
                     .size(annot.original().length())
-                    .primary(PrimaryEmotion.valueOf(annot.getInfo().getGlobal().toString()))
-                    .secondary(SecondaryEmotion.valueOf(annot.getInfo().getIntermediate().toString()))
-                    .tertiary(TertiaryEmotion.valueOf(annot.getInfo().getSpecific().toString())))
+                    .primary(annot.getInfo().getGlobal() != null
+                        ? PrimaryEmotion.valueOf(annot.getInfo().getGlobal().toString())
+                        : null
+                    )
+                    .secondary(annot.getInfo().getIntermediate() != null
+                        ? SecondaryEmotion.valueOf(annot.getInfo().getIntermediate().toString())
+                        : null
+                    )
+                    .tertiary(annot.getInfo().getSpecific() != null
+                        ? TertiaryEmotion.valueOf(annot.getInfo().getSpecific().toString())
+                        : null
+                    )
+                )
                 .collect(Collectors.toList());
 
             emotionRepository.saveAll(emotions);
@@ -186,7 +198,15 @@ public class AnalysisServiceImpl implements AnalysisService {
         Analysis analysis = analysisMapper.toEntity(analysisDTO);
         analysis.setProjectId(projectId);
         analysis.setTextId(textId);
-        deleteOldAnalyses(projectId, textId, analysisDTO.getId(), false);
+        AnalysisDTO oldAnalysis = deleteOldAnalyses(projectId, textId, analysisDTO.getId(), false);
+        if (oldAnalysis != null) {
+            oldAnalysis.getEmotions().parallelStream()
+                .filter(emotionDTO -> !analysisDTO.getEmotions().contains(emotionDTO))
+                .forEach(emotionDTO -> emotionRepository.deleteByAnalysisIdAndId(analysisDTO.getId(), emotionDTO.getId()));
+            oldAnalysis.getPartsOfSpeech().parallelStream()
+                .filter(posDTO -> !analysisDTO.getPartsOfSpeech().contains(posDTO))
+                .forEach(posDTO -> partOfSpeechRepository.deleteByAnalysisIdAndId(analysisDTO.getId(), posDTO.getId()));
+        }
         analysis
             .partsOfSpeech(new HashSet<>(partOfSpeechRepository.saveAll(analysis.getPartsOfSpeech())));
         analysis
@@ -241,20 +261,23 @@ public class AnalysisServiceImpl implements AnalysisService {
         deleteLinkedData(id);
     }
 
-    private void deleteOldAnalyses(
+    private AnalysisDTO deleteOldAnalyses(
         Long projectId, Long textId,
         String analysisId, boolean currentLinkedData
     ) {
+        AnalysisDTO current = null;
         List<AnalysisDTO> oldAnalyses = findAll(projectId, textId);
         if (!oldAnalyses.isEmpty()) {
-            oldAnalyses.forEach(oldAnalysis -> {
+            for (AnalysisDTO oldAnalysis : oldAnalyses) {
                 if (!Objects.equals(oldAnalysis.getId(), analysisId)) {
                     analysisRepository.delete(analysisMapper.toEntity(oldAnalysis));
                 } else if (currentLinkedData) {
+                    current = oldAnalysis;
                     deleteLinkedData(oldAnalysis.getId());
                 }
-            });
+            }
         }
+        return current;
     }
 
     private void deleteLinkedData(String analysisId) {

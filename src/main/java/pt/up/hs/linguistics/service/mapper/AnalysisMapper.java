@@ -21,9 +21,9 @@ public interface AnalysisMapper extends EntityMapper<AnalysisDTO, Analysis> {
     @Mapping(target = "removeFunctionalWordFrequency", ignore = true)
     @Mapping(target = "removeLemmaFrequency", ignore = true)
     @Mapping(target = "removeCoOccurrence", ignore = true)
-    @Mapping(target = "emotions", ignore = true)
+    /*@Mapping(target = "emotions", ignore = true)*/
     @Mapping(target = "removeEmotion", ignore = true)
-    @Mapping(target = "partsOfSpeech", ignore = true)
+    /*@Mapping(target = "partsOfSpeech", ignore = true)*/
     @Mapping(target = "removePartOfSpeech", ignore = true)
     Analysis toEntity(AnalysisDTO analysisDTO);
 
