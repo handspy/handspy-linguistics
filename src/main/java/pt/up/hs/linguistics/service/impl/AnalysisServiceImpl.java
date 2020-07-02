@@ -200,17 +200,14 @@ public class AnalysisServiceImpl implements AnalysisService {
         analysis.setTextId(textId);
         AnalysisDTO oldAnalysis = deleteOldAnalyses(projectId, textId, analysisDTO.getId(), false);
         if (oldAnalysis != null) {
-            oldAnalysis.getEmotions().parallelStream()
-                .filter(emotionDTO -> !analysisDTO.getEmotions().contains(emotionDTO))
-                .forEach(emotionDTO -> emotionRepository.deleteByAnalysisIdAndId(analysisDTO.getId(), emotionDTO.getId()));
-            oldAnalysis.getPartsOfSpeech().parallelStream()
+            /*oldAnalysis.getPartsOfSpeech().parallelStream()
                 .filter(posDTO -> !analysisDTO.getPartsOfSpeech().contains(posDTO))
-                .forEach(posDTO -> partOfSpeechRepository.deleteByAnalysisIdAndId(analysisDTO.getId(), posDTO.getId()));
+                .forEach(posDTO -> partOfSpeechRepository.deleteByAnalysisIdAndId(analysisDTO.getId(), posDTO.getId()));*/
+            emotionRepository.deleteByAnalysisId(analysisDTO.getId());
         }
-        analysis
-            .partsOfSpeech(new HashSet<>(partOfSpeechRepository.saveAll(analysis.getPartsOfSpeech())));
-        analysis
-            .emotions(new HashSet<>(emotionRepository.saveAll(analysis.getEmotions())));
+        /*analysis
+            .partsOfSpeech(new HashSet<>(partOfSpeechRepository.saveAll(analysis.getPartsOfSpeech())));*/
+        analysis.emotions(new HashSet<>(emotionRepository.saveAll(analysis.getEmotions())));
         analysis = analysisRepository.save(analysis);
         return analysisMapper.toDto(analysis);
     }
