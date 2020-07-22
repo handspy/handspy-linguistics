@@ -225,6 +225,8 @@ dependencies {
     implementation "org.msgpack:jackson-dataformat-msgpack:${msgpack_version}"
     implementation "org.xerial.snappy:snappy-java:${snappy_version}"
     implementation "pt.up.hs:linguini:${linguini_version}"
+    implementation "org.apache.poi:poi:${poi_version}"
+    implementation "org.apache.poi:poi-ooxml:${poi_version}"
     annotationProcessor "org.mapstruct:mapstruct-processor:${mapstruct_version}"
     annotationProcessor "org.springframework.boot:spring-boot-configuration-processor:${spring_boot_version}"
     testImplementation ("org.springframework.boot:spring-boot-starter-test") {

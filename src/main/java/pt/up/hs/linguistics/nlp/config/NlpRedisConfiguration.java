@@ -9,11 +9,12 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import pt.up.hs.linguistics.config.ApplicationProperties;
 
-/*@Configuration
-@EnableRedisRepositories*/
+
+//@Configuration
+//@EnableRedisRepositories
 public class NlpRedisConfiguration {
 
-    /*@Bean*/
+    //@Bean
     public LettuceConnectionFactory redisConnectionFactory(
         ApplicationProperties appProperties
     ) {
@@ -28,7 +29,7 @@ public class NlpRedisConfiguration {
         return connectionFactory;
     }
 
-    /*@Bean*/
+    //@Bean
     public RedisTemplate<?, ?> redisTemplate(LettuceConnectionFactory connectionFactory) {
         RedisTemplate<byte[], byte[]> template = new RedisTemplate<>();
         template.setConnectionFactory(connectionFactory);

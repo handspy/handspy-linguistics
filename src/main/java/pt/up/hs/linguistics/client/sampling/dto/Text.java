@@ -1,5 +1,7 @@
 package pt.up.hs.linguistics.client.sampling.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 import java.io.Serializable;
 
 /**
@@ -9,10 +11,28 @@ import java.io.Serializable;
  */
 public class Text implements Serializable {
 
+    private Long taskId;
+    private Long participantId;
     private String text;
     private String language;
 
     public Text() {
+    }
+
+    public Long getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(Long taskId) {
+        this.taskId = taskId;
+    }
+
+    public Long getParticipantId() {
+        return participantId;
+    }
+
+    public void setParticipantId(Long participantId) {
+        this.participantId = participantId;
     }
 
     public String getText() {
