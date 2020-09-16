@@ -14,9 +14,14 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.convert.converter.Converter;
+import org.springframework.data.mongodb.MongoDbFactory;
 import org.springframework.data.mongodb.config.EnableMongoAuditing;
 import org.springframework.data.mongodb.core.MongoTemplate;
+import org.springframework.data.mongodb.core.convert.DbRefResolver;
+import org.springframework.data.mongodb.core.convert.DefaultDbRefResolver;
+import org.springframework.data.mongodb.core.convert.MappingMongoConverter;
 import org.springframework.data.mongodb.core.convert.MongoCustomConversions;
+import org.springframework.data.mongodb.core.mapping.MongoMappingContext;
 import org.springframework.data.mongodb.core.mapping.event.ValidatingMongoEventListener;
 import org.springframework.data.mongodb.repository.config.EnableMongoRepositories;
 
@@ -61,4 +66,16 @@ public class DatabaseConfiguration {
         mongobee.setChangeLogsScanPackage("pt.up.hs.linguistics.config.dbmigrations");
         mongobee.setEnabled(true);
         return mongobee;
-    }}
+    }
+
+    @Bean
+    public MappingMongoConverter mongoConverter(
+        MongoDbFactory mongoFactory,
+        MongoMappingContext mongoMappingContext
+    ) throws Exception {
+        DbRefResolver dbRefResolver = new DefaultDbRefResolver(mongoFactory);
+        MappingMongoConverter mongoConverter = new MappingMongoConverter(dbRefResolver, mongoMappingContext);
+        mongoConverter.setMapKeyDotReplacement("-DOT");
+        return mongoConverter;
+    }
+}
