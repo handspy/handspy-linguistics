@@ -62,7 +62,7 @@ public class ExportResource {
     @GetMapping("/export")
     public ResponseEntity<InputStreamResource> bulkExport(
         @PathVariable("projectId") Long projectId,
-        @RequestParam(value="textId[]") Long[] textIds
+        @RequestParam(value="textId") Long[] textIds
     ) {
         log.debug("REST request to bulk export the analyses of texts {} of project {}", textIds, projectId);
         ByteArrayInputStream bais = exportService.bulkExport(projectId, textIds);
