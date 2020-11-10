@@ -137,6 +137,9 @@ public class LinguisticsReportBuilder {
             .sorted(Comparator.comparingDouble(e -> ((Map.Entry<String, Double>) e).getValue()).reversed())
             .forEachOrdered(c -> {
                 String[] words = c.getKey().split("--");
+                if (words.length < 2) {
+                    return;
+                }
                 sheet.addRow(new Object[]{words[0], words[1], c.getValue()});
             });
 
