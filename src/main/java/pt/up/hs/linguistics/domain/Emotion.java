@@ -202,4 +202,17 @@ public class Emotion implements Serializable {
             ", note='" + getNote() + "'" +
             "}";
     }
+
+    public String toDisplayString() {
+        String str = getPrimary().toString().toUpperCase();
+        if (getSecondary() == null) {
+            return str;
+        }
+        str += " > " + getSecondary().toString().toUpperCase();
+        if (getTertiary() == null) {
+            return str;
+        }
+        str += " > " + getTertiary().toString().toUpperCase();
+        return str;
+    }
 }

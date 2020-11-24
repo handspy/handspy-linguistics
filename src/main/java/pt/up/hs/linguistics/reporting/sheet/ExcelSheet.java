@@ -41,6 +41,8 @@ public class ExcelSheet extends TabularSheet {
                     cell.setCellValue((double) values[j]);
                 } else if (values[j] instanceof Integer) {
                     cell.setCellValue((int) values[j]);
+                } else if (values[j] instanceof Long) {
+                    cell.setCellValue((long) values[j]);
                 } else if (values[j] instanceof Boolean) {
                     cell.setCellValue((boolean) values[j]);
                 }

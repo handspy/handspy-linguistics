@@ -2,11 +2,13 @@ package pt.up.hs.linguistics.reporting;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import pt.up.hs.linguistics.domain.Emotion;
 import pt.up.hs.linguistics.domain.enumeration.PoSTag;
 import pt.up.hs.linguistics.reporting.sheet.ExcelSheet;
 import pt.up.hs.linguistics.reporting.workbook.ExcelWorkbook;
 
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class LinguisticsReportBuilder {
@@ -18,6 +20,7 @@ public class LinguisticsReportBuilder {
     private final Map<String, ExcelSheet> wordFrequenciesSheets = new HashMap<>();
     private final Map<String, ExcelSheet> posTagsSheets = new HashMap<>();
     private final Map<String, ExcelSheet> coOccurrencesSheets = new HashMap<>();
+    private final Map<String, ExcelSheet> emotionalSheets = new HashMap<>();
 
     public LinguisticsReportBuilder(
         MessageSource i18n
@@ -148,6 +151,34 @@ public class LinguisticsReportBuilder {
         return this;
     }
 
+    public LinguisticsReportBuilder newEmotionalSheet(
+        String code,
+        Set<Emotion> emotions
+    ) {
+
+        ExcelSheet sheet = new ExcelSheet();
+        sheet.setName(
+            i18n.getMessage("report.emotions", new String[]{code}, LocaleContextHolder.getLocale())
+        );
+        sheet.setHeader(
+            i18n.getMessage("report.emotions.category", null, LocaleContextHolder.getLocale()),
+            i18n.getMessage("report.emotions.count", null, LocaleContextHolder.getLocale()),
+            i18n.getMessage("report.emotions.percentage", null, LocaleContextHolder.getLocale())
+        );
+
+        Map<String, Long> groupedEmotions = emotions.stream()
+            .collect(Collectors.groupingBy(Emotion::toDisplayString, Collectors.counting()));
+        groupedEmotions.entrySet().stream()
+            .sorted(Comparator.comparingLong(Map.Entry<String, Long>::getValue).reversed())
+            .forEachOrdered(emotion -> {
+                sheet.addRow(new Object[]{ emotion.getKey(), emotion.getValue(), (double) emotion.getValue() / emotions.size() * 100 });
+            });
+
+        emotionalSheets.put(code, sheet);
+
+        return this;
+    }
+
     public ExcelWorkbook conclude() {
 
         ExcelWorkbook workbook = new ExcelWorkbook();
@@ -170,6 +201,9 @@ public class LinguisticsReportBuilder {
             }
             if (coOccurrencesSheets.containsKey(code)) {
                 workbook.addSheet(coOccurrencesSheets.get(code));
+            }
+            if (emotionalSheets.containsKey(code)) {
+                workbook.addSheet(emotionalSheets.get(code));
             }
         }
 
