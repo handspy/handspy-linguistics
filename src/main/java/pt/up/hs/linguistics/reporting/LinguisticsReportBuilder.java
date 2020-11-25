@@ -31,6 +31,7 @@ public class LinguisticsReportBuilder {
 
     public LinguisticsReportBuilder newSummaryLine(
         String code,
+        String task, String participant,
         Integer characterCount, Integer nonBlankCharacterCount,
         Integer wordCount, Integer distinctWordCount,
         Integer functionWordCount, Integer distinctFunctionWordCount,
@@ -45,7 +46,7 @@ public class LinguisticsReportBuilder {
         Double ideaDensity
     ) {
         summaryValues.put(code, new Object[] {
-            code,
+            code, task, participant,
             characterCount, nonBlankCharacterCount,
             wordCount, distinctWordCount,
             functionWordCount, distinctFunctionWordCount,
@@ -217,6 +218,8 @@ public class LinguisticsReportBuilder {
         );
         summarySheet.setHeader(
             i18n.getMessage("report.summary.code", null, LocaleContextHolder.getLocale()),
+            i18n.getMessage("report.summary.task", null, LocaleContextHolder.getLocale()),
+            i18n.getMessage("report.summary.participant", null, LocaleContextHolder.getLocale()),
             i18n.getMessage("report.summary.characters", null, LocaleContextHolder.getLocale()),
             i18n.getMessage("report.summary.nonBlankCharacters", null, LocaleContextHolder.getLocale()),
             i18n.getMessage("report.summary.words", null, LocaleContextHolder.getLocale()),

@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
+import pt.up.hs.linguistics.client.project.ProjectFeignClient;
+import pt.up.hs.linguistics.client.project.dto.Participant;
+import pt.up.hs.linguistics.client.project.dto.Task;
 import pt.up.hs.linguistics.client.sampling.SamplingFeignClient;
 import pt.up.hs.linguistics.client.sampling.dto.Text;
 import pt.up.hs.linguistics.constants.EntityNames;
@@ -30,15 +33,18 @@ public class ExportServiceImpl implements ExportService {
 
     private final AnalysisRepository analysisRepository;
     private final SamplingFeignClient samplingFeignClient;
+    private final ProjectFeignClient projectFeignClient;
 
     public ExportServiceImpl(
         MessageSource messageSource,
         AnalysisRepository analysisRepository,
-        SamplingFeignClient samplingFeignClient
+        SamplingFeignClient samplingFeignClient,
+        ProjectFeignClient projectFeignClient
     ) {
         this.messageSource = messageSource;
         this.analysisRepository = analysisRepository;
         this.samplingFeignClient = samplingFeignClient;
+        this.projectFeignClient = projectFeignClient;
     }
 
     @Override
@@ -94,8 +100,14 @@ public class ExportServiceImpl implements ExportService {
 
         String code = String.format("T%d_P%d", text.getTaskId(), text.getParticipantId());
 
+        Task task = projectFeignClient.getTask(projectId, text.getTaskId());
+        String taskName = task == null ? "??" : task.getName();
+
+        Participant participant = projectFeignClient.getParticipant(projectId, text.getParticipantId());
+        String participantName = participant == null ? "??" : participant.getName();
+
         lrBuilder.newSummaryLine(
-            code,
+            code, taskName, participantName,
             analysis.getCharacterCount(),
             analysis.getNonBlankCharacterCount(),
             analysis.getWordCount(),
