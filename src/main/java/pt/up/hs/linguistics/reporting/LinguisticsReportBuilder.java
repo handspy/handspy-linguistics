@@ -3,6 +3,7 @@ package pt.up.hs.linguistics.reporting;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
 import pt.up.hs.linguistics.domain.Emotion;
+import pt.up.hs.linguistics.client.sampling.dto.Text;
 import pt.up.hs.linguistics.domain.enumeration.PoSTag;
 import pt.up.hs.linguistics.reporting.sheet.ExcelSheet;
 import pt.up.hs.linguistics.reporting.workbook.ExcelWorkbook;
@@ -154,7 +155,8 @@ public class LinguisticsReportBuilder {
 
     public LinguisticsReportBuilder newEmotionalSheet(
         String code,
-        Set<Emotion> emotions
+        Set<Emotion> emotions,
+        Text text
     ) {
 
         ExcelSheet sheet = new ExcelSheet();
@@ -164,15 +166,39 @@ public class LinguisticsReportBuilder {
         sheet.setHeader(
             i18n.getMessage("report.emotions.category", null, LocaleContextHolder.getLocale()),
             i18n.getMessage("report.emotions.count", null, LocaleContextHolder.getLocale()),
-            i18n.getMessage("report.emotions.percentage", null, LocaleContextHolder.getLocale())
+            i18n.getMessage("report.emotions.percentage", null, LocaleContextHolder.getLocale()),
+            i18n.getMessage("report.emotions.words", null, LocaleContextHolder.getLocale())
         );
+
+        String textStr = text.getText();
+        Map<String, List<String>> wordsByEmotion = emotions.stream()
+            .collect(Collectors.groupingBy(
+                Emotion::toDisplayString,
+                Collectors.mapping(
+                    e -> textStr.substring(e.getStart(), e.getStart() + e.getSize()).toLowerCase(),
+                    Collectors.toList()
+                )
+            ));
 
         Map<String, Long> groupedEmotions = emotions.stream()
             .collect(Collectors.groupingBy(Emotion::toDisplayString, Collectors.counting()));
         groupedEmotions.entrySet().stream()
             .sorted(Comparator.comparingLong(Map.Entry<String, Long>::getValue).reversed())
             .forEachOrdered(emotion -> {
-                sheet.addRow(new Object[]{ emotion.getKey(), emotion.getValue(), (double) emotion.getValue() / emotions.size() * 100 });
+                Set<String> words = wordsByEmotion.getOrDefault(emotion.getKey(), new ArrayList<>())
+                    .stream().parallel()
+                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                    .entrySet()
+                    .stream()
+                    .map(e -> e.getValue() > 1 ? String.format("%s (%d)", e.getKey(), e.getValue()) : e.getKey())
+                    .collect(Collectors.toSet());
+
+                sheet.addRow(new Object[]{
+                    emotion.getKey(),
+                    emotion.getValue(),
+                    (double) emotion.getValue() / emotions.size() * 100,
+                    String.join("; ", words)
+                });
             });
 
         emotionalSheets.put(code, sheet);

@@ -132,6 +132,6 @@ public class ExportServiceImpl implements ExportService {
         lrBuilder.newWordFrequencySheet(code, analysis.getContentWordFrequencies(), analysis.getFunctionalWordFrequencies());
         lrBuilder.newPoSTagSheet(code, analysis.getWordsByCategory());
         lrBuilder.newCoOccurrencesSheet(code, analysis.getCoOccurrences());
-        lrBuilder.newEmotionalSheet(code, analysis.getEmotions());
+        lrBuilder.newEmotionalSheet(code, analysis.getEmotions(), text);
     }
 }
