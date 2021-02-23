@@ -55,9 +55,9 @@ public class PartOfSpeech implements Serializable {
     @Field("note")
     private String note;
 
-    @DBRef
+    @DBRef(lazy = true)
     @Field("analysis")
-    @JsonIgnoreProperties(value = "partOfSpeeches", allowSetters = true)
+    @JsonIgnoreProperties(value = {"emotions", "partsOfSpeech"}, allowSetters = true)
     private Analysis analysis;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here

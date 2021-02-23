@@ -1,6 +1,7 @@
 package pt.up.hs.linguistics.domain;
 
 import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Reference;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 import org.springframework.data.mongodb.core.mapping.DBRef;
@@ -108,11 +109,13 @@ public class Analysis implements Serializable {
     @Field("idea_density")
     private Double ideaDensity;
 
-    @DBRef
+    @DBRef(lazy = true)
+    @Reference(to = Emotion.class)
     @Field("emotion")
     private Set<Emotion> emotions = new HashSet<>();
 
-    @DBRef
+    @DBRef(lazy = true)
+    @Reference(to = PartOfSpeech.class)
     @Field("part_of_speech")
     private Set<PartOfSpeech> partsOfSpeech = new HashSet<>();
 

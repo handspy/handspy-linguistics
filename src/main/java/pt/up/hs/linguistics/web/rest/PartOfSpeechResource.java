@@ -38,7 +38,7 @@ public class PartOfSpeechResource {
     }
 
     /**
-     * {@code POST  /part-of-speeches} : Create a new partOfSpeech.
+     * {@code POST  /parts-of-speech} : Create a new partOfSpeech.
      *
      * @param projectId   ID of the project.
      * @param textId      ID of the text analyzed.
@@ -47,7 +47,7 @@ public class PartOfSpeechResource {
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new partOfSpeechDTO, or with status {@code 400 (Bad Request)} if the partOfSpeech has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
-    @PostMapping("/part-of-speeches")
+    @PostMapping("/parts-of-speech")
     public ResponseEntity<PartOfSpeechDTO> createPartOfSpeech(
         @PathVariable("projectId") Long projectId,
         @PathVariable("textId") Long textId,
@@ -59,13 +59,13 @@ public class PartOfSpeechResource {
             throw new BadRequestAlertException("A new partOfSpeech cannot already have an ID", EntityNames.PART_OF_SPEECH, "idexists");
         }
         PartOfSpeechDTO result = partOfSpeechService.save(projectId, textId, analysisId, partOfSpeechDTO);
-        return ResponseEntity.created(new URI("/api/projects/" + projectId + "/texts/" + textId + "/analyses/" + analysisId + "/part-of-speeches/" + result.getId()))
+        return ResponseEntity.created(new URI("/api/projects/" + projectId + "/texts/" + textId + "/analyses/" + analysisId + "/parts-of-speech/" + result.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, EntityNames.PART_OF_SPEECH, result.getId()))
             .body(result);
     }
 
     /**
-     * {@code PUT  /part-of-speeches} : Updates an existing partOfSpeech.
+     * {@code PUT  /parts-of-speech} : Updates an existing partOfSpeech.
      *
      * @param projectId   ID of the project.
      * @param textId      ID of the text analyzed.
@@ -75,7 +75,7 @@ public class PartOfSpeechResource {
      * or with status {@code 400 (Bad Request)} if the partOfSpeechDTO is not valid,
      * or with status {@code 500 (Internal Server Error)} if the partOfSpeechDTO couldn't be updated.
      */
-    @PutMapping("/part-of-speeches")
+    @PutMapping("/parts-of-speech")
     public ResponseEntity<PartOfSpeechDTO> updatePartOfSpeech(
         @PathVariable("projectId") Long projectId,
         @PathVariable("textId") Long textId,
@@ -93,25 +93,25 @@ public class PartOfSpeechResource {
     }
 
     /**
-     * {@code GET  /part-of-speeches} : get all the partOfSpeeches.
+     * {@code GET  /parts-of-speech} : get all the partOfSpeeches.
      *
      * @param projectId   ID of the project.
      * @param textId      ID of the text analyzed.
      * @param analysisId  ID of the analysis.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of partOfSpeeches in body.
      */
-    @GetMapping("/part-of-speeches")
+    @GetMapping("/parts-of-speech")
     public List<PartOfSpeechDTO> getAllPartOfSpeeches(
         @PathVariable("projectId") Long projectId,
         @PathVariable("textId") Long textId,
         @PathVariable("analysisId") String analysisId
     ) {
-        log.debug("REST request to get all part-of-speeches from analysis {} in text {} of project {}", analysisId, textId, projectId);
+        log.debug("REST request to get all parts-of-speech from analysis {} in text {} of project {}", analysisId, textId, projectId);
         return partOfSpeechService.findAll(projectId, textId, analysisId);
     }
 
     /**
-     * {@code GET  /part-of-speeches/:id} : get the "id" part-of-speech.
+     * {@code GET  /parts-of-speech/:id} : get the "id" part-of-speech.
      *
      * @param projectId   ID of the project.
      * @param textId      ID of the text analyzed.
@@ -119,7 +119,7 @@ public class PartOfSpeechResource {
      * @param id the id of the partOfSpeechDTO to retrieve.
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the partOfSpeechDTO, or with status {@code 404 (Not Found)}.
      */
-    @GetMapping("/part-of-speeches/{id}")
+    @GetMapping("/parts-of-speech/{id}")
     public ResponseEntity<PartOfSpeechDTO> getPartOfSpeech(
         @PathVariable("projectId") Long projectId,
         @PathVariable("textId") Long textId,
@@ -132,7 +132,7 @@ public class PartOfSpeechResource {
     }
 
     /**
-     * {@code DELETE  /part-of-speeches/:id} : delete the "id" partOfSpeech.
+     * {@code DELETE  /parts-of-speech/:id} : delete the "id" partOfSpeech.
      *
      * @param projectId   ID of the project.
      * @param textId      ID of the text analyzed.
@@ -140,7 +140,7 @@ public class PartOfSpeechResource {
      * @param id the id of the partOfSpeechDTO to delete.
      * @return the {@link ResponseEntity} with status {@code 204 (NO_CONTENT)}.
      */
-    @DeleteMapping("/part-of-speeches/{id}")
+    @DeleteMapping("/parts-of-speech/{id}")
     public ResponseEntity<Void> deletePartOfSpeech(
         @PathVariable("projectId") Long projectId,
         @PathVariable("textId") Long textId,

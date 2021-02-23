@@ -1,7 +1,9 @@
 package pt.up.hs.linguistics.service;
 
 import pt.up.hs.linguistics.service.dto.AnalysisDTO;
+import pt.up.hs.linguistics.service.dto.EmotionDTO;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,9 +51,10 @@ public interface AnalysisService {
      * @param projectId ID of the project to which the analysis belongs.
      * @param textId    ID of the text to which the analysis belongs.
      * @param id        the id of the entity.
+     * @param full      return full analysis.
      * @return the entity.
      */
-    Optional<AnalysisDTO> findOne(Long projectId, Long textId, String id);
+    Optional<AnalysisDTO> findOne(Long projectId, Long textId, String id, boolean full);
 
     /**
      * Delete the "id" analysis.
@@ -61,4 +64,14 @@ public interface AnalysisService {
      * @param id        the id of the entity.
      */
     void delete(Long projectId, Long textId, String id);
+
+    /**
+     *
+     * @param projectId   ID of the project to which the analysis belongs.
+     * @param textId      ID of the text to which the analysis belongs.
+     * @param id          ID of the analysis.
+     * @param emotionDTOs the emotion DTOs.
+     * @return the saved emotions.
+     */
+    Collection<EmotionDTO> upsertEmotional(Long projectId, Long textId, String id, Collection<EmotionDTO> emotionDTOs);
 }

@@ -20,12 +20,17 @@ import pt.up.hs.linguistics.repository.EmotionRepository;
 import pt.up.hs.linguistics.repository.PartOfSpeechRepository;
 import pt.up.hs.linguistics.service.AnalysisService;
 import pt.up.hs.linguistics.service.dto.AnalysisDTO;
+import pt.up.hs.linguistics.service.dto.EmotionDTO;
 import pt.up.hs.linguistics.service.exceptions.ServiceException;
 import pt.up.hs.linguistics.service.mapper.AnalysisMapper;
+import pt.up.hs.linguistics.service.mapper.EmotionMapper;
 import pt.up.hs.linguistics.utils.StringUtils;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.zalando.problem.Status.NOT_FOUND;
+import static pt.up.hs.linguistics.domain.enumeration.Status.*;
 
 /**
  * Service Implementation for managing {@link Analysis}.
@@ -39,6 +44,8 @@ public class AnalysisServiceImpl implements AnalysisService {
     private final AnalysisMapper analysisMapper;
 
     private final EmotionRepository emotionRepository;
+    private final EmotionMapper emotionMapper;
+
     private final PartOfSpeechRepository partOfSpeechRepository;
 
     private final SamplingFeignClient samplingFeignClient;
@@ -48,6 +55,8 @@ public class AnalysisServiceImpl implements AnalysisService {
         AnalysisMapper analysisMapper,
 
         EmotionRepository emotionRepository,
+        EmotionMapper emotionMapper,
+
         PartOfSpeechRepository partOfSpeechRepository,
 
         SamplingFeignClient samplingFeignClient
@@ -55,6 +64,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         this.analysisRepository = analysisRepository;
         this.analysisMapper = analysisMapper;
         this.emotionRepository = emotionRepository;
+        this.emotionMapper = emotionMapper;
         this.partOfSpeechRepository = partOfSpeechRepository;
         this.samplingFeignClient = samplingFeignClient;
     }
@@ -96,7 +106,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         try {
             LinguisticsReport report = linguini.analyze(text.getText());
             analysis
-                .status(Status.COMPLETED)
+                .status(COMPLETED)
                 .language(locale.toString())
                 .characterCount(report.getCharacterCount())
                 .nonBlankCharacterCount(report.getNonBlankCharacterCount())
@@ -137,9 +147,12 @@ public class AnalysisServiceImpl implements AnalysisService {
 
                 .ideaDensity(report.getIdeaDensity());
 
+            final Analysis savedAnalysis = analysisRepository.save(analysis);
+
             List<Emotion> emotions = report.getEmotionalAnnotations()
                 .parallelStream()
                 .map(annot -> new Emotion()
+                    .analysis(analysisMapper.fromId(savedAnalysis.getId()))
                     .start(annot.getToken().getStart())
                     .size(annot.original().length())
                     .primary(annot.getInfo().getGlobal() != null
@@ -158,11 +171,12 @@ public class AnalysisServiceImpl implements AnalysisService {
                 .collect(Collectors.toList());
 
             emotionRepository.saveAll(emotions);
-            analysis.emotions(new HashSet<>(emotions));
+            // savedAnalysis.emotions(new HashSet<>(emotions));
 
             List<PartOfSpeech> partsOfSpeech = report.getMorphologicalAnnotations()
                 .parallelStream()
                 .map(annot ->  new PartOfSpeech()
+                    .analysis(analysisMapper.fromId(savedAnalysis.getId()))
                     .start(annot.getToken().getStart())
                     .size(annot.getToken().size())
                     .tag(PoSTag.valueOf(annot.getInfo().toUpperCase()))
@@ -170,7 +184,9 @@ public class AnalysisServiceImpl implements AnalysisService {
                 .collect(Collectors.toList());
 
             partOfSpeechRepository.saveAll(partsOfSpeech);
-            analysis.partsOfSpeech(new HashSet<>(partsOfSpeech));
+            // savedAnalysis.partsOfSpeech(new HashSet<>(partsOfSpeech));
+
+            return analysisMapper.toDto(analysis);
 
         } catch (LinguiniException e) {
             throw new ServiceException(
@@ -179,9 +195,6 @@ public class AnalysisServiceImpl implements AnalysisService {
                 "Linguistic analysis failed. Cause: " + e.getMessage()
             );
         }
-
-        analysis = analysisRepository.save(analysis);
-        return analysisMapper.toDto(analysis);
     }
 
     /**
@@ -198,16 +211,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         Analysis analysis = analysisMapper.toEntity(analysisDTO);
         analysis.setProjectId(projectId);
         analysis.setTextId(textId);
-        AnalysisDTO oldAnalysis = deleteOldAnalyses(projectId, textId, analysisDTO.getId(), false);
-        if (oldAnalysis != null) {
-            /*oldAnalysis.getPartsOfSpeech().parallelStream()
-                .filter(posDTO -> !analysisDTO.getPartsOfSpeech().contains(posDTO))
-                .forEach(posDTO -> partOfSpeechRepository.deleteByAnalysisIdAndId(analysisDTO.getId(), posDTO.getId()));*/
-            emotionRepository.deleteByAnalysisId(analysisDTO.getId());
-        }
-        /*analysis
-            .partsOfSpeech(new HashSet<>(partOfSpeechRepository.saveAll(analysis.getPartsOfSpeech())));*/
-        analysis.emotions(new HashSet<>(emotionRepository.saveAll(analysis.getEmotions())));
+        // AnalysisDTO oldAnalysis = deleteOldAnalyses(projectId, textId, analysisDTO.getId(), false);
         analysis = analysisRepository.save(analysis);
         return analysisMapper.toDto(analysis);
     }
@@ -222,7 +226,7 @@ public class AnalysisServiceImpl implements AnalysisService {
     @Override
     public List<AnalysisDTO> findAll(Long projectId, Long textId) {
         log.debug("Request to get all analyses of text {} in project {}", textId, projectId);
-        return analysisRepository.findByProjectIdAndTextId(projectId, textId).stream()
+        return analysisRepository.findAnalysesByProjectIdAndTextId(projectId, textId).stream()
             .map(analysisMapper::toDto)
             .collect(Collectors.toCollection(LinkedList::new));
     }
@@ -234,14 +238,21 @@ public class AnalysisServiceImpl implements AnalysisService {
      * @param projectId ID of the project to which the analysis belongs.
      * @param textId    ID of the text to which the analysis belongs.
      * @param id        the id of the entity.
+     * @param full      return full analysis.
      * @return the entity.
      */
     @Override
-    public Optional<AnalysisDTO> findOne(Long projectId, Long textId, String id) {
+    public Optional<AnalysisDTO> findOne(Long projectId, Long textId, String id, boolean full) {
         log.debug("Request to get analysis {} of text {} in project {}", id, textId, projectId);
-        return analysisRepository
-            .findByProjectIdAndTextIdAndId(projectId, textId, id)
-            .map(analysisMapper::toDto);
+        if (full) {
+            return analysisRepository
+                .findFullAnalysisByProjectIdAndTextIdAndId(projectId, textId, id)
+                .map(analysisMapper::toDto);
+        } else {
+            return analysisRepository
+                .findAnalysisByProjectIdAndTextIdAndId(projectId, textId, id)
+                .map(analysisMapper::toDto);
+        }
     }
 
     /**
@@ -258,16 +269,43 @@ public class AnalysisServiceImpl implements AnalysisService {
         deleteLinkedData(id);
     }
 
+    @Override
+    public Collection<EmotionDTO> upsertEmotional(Long projectId, Long textId, String id, Collection<EmotionDTO> emotionDTOs) {
+        log.debug("Request to upsert emotions {} in analysis {} of text {} in project {}", emotionDTOs, id, textId, projectId);
+        Analysis analysis = analysisRepository
+            .findAnalysisByProjectIdAndTextIdAndId(projectId, textId, id)
+            .orElse(null);
+        if (analysis == null) {
+            throw new ServiceException(NOT_FOUND, EntityNames.ANALYSIS, ErrorKeys.ERR_NOT_FOUND, "Analysis not found");
+        }
+        emotionRepository.deleteByAnalysisId(id);
+        List<Emotion> emotions = emotionDTOs.parallelStream()
+            .map(emotionMapper::toEntity)
+            .peek(emotion -> {
+                emotion.setId(null);
+                emotion.setAnalysis(analysisMapper.fromId(id));
+            })
+            .collect(Collectors.toList());
+        List<Emotion> savedEmotions = emotionRepository.saveAll(emotions);
+        /*analysis.setEmotions(new HashSet<>(savedEmotions));
+        analysisRepository.save(analysis);*/
+        return savedEmotions
+            .parallelStream()
+            .map(emotionMapper::toDto)
+            .collect(Collectors.toList());
+    }
+
     private AnalysisDTO deleteOldAnalyses(
         Long projectId, Long textId,
-        String analysisId, boolean currentLinkedData
+        String analysisId,
+        boolean currentLinkedData
     ) {
         AnalysisDTO current = null;
         List<AnalysisDTO> oldAnalyses = findAll(projectId, textId);
         if (!oldAnalyses.isEmpty()) {
             for (AnalysisDTO oldAnalysis : oldAnalyses) {
                 if (!Objects.equals(oldAnalysis.getId(), analysisId)) {
-                    analysisRepository.delete(analysisMapper.toEntity(oldAnalysis));
+                    analysisRepository.deleteByProjectIdAndTextIdAndId(projectId, textId, oldAnalysis.getId());
                 } else if (currentLinkedData) {
                     current = oldAnalysis;
                     deleteLinkedData(oldAnalysis.getId());

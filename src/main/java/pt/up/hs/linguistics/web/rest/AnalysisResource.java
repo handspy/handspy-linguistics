@@ -2,6 +2,7 @@ package pt.up.hs.linguistics.web.rest;
 
 import pt.up.hs.linguistics.constants.EntityNames;
 import pt.up.hs.linguistics.service.AnalysisService;
+import pt.up.hs.linguistics.service.dto.EmotionDTO;
 import pt.up.hs.linguistics.web.rest.errors.BadRequestAlertException;
 import pt.up.hs.linguistics.service.dto.AnalysisDTO;
 
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -128,10 +130,11 @@ public class AnalysisResource {
     public ResponseEntity<AnalysisDTO> getAnalysis(
         @PathVariable("projectId") Long projectId,
         @PathVariable("textId") Long textId,
-        @PathVariable String id
+        @PathVariable String id,
+        @RequestParam(name = "full", required = false, defaultValue = "false") boolean full
     ) {
         log.debug("REST request to get analysis {} of text {} of project {}", id, textId, projectId);
-        Optional<AnalysisDTO> analysisDTO = analysisService.findOne(projectId, textId, id);
+        Optional<AnalysisDTO> analysisDTO = analysisService.findOne(projectId, textId, id, full);
         return ResponseUtil.wrapOrNotFound(analysisDTO);
     }
 
@@ -155,5 +158,28 @@ public class AnalysisResource {
             .noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, EntityNames.ANALYSIS, id))
             .build();
+    }
+
+    /**
+     * {@code POST  /emotional} : Upsert emotional part.
+     *
+     * @param projectId   ID of the project.
+     * @param textId      ID of the text analyzed.
+     * @param analysisId  ID of the analysis.
+     * @param emotionDTOs the emotion DTOs.
+     * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the new emotionDTOs,
+     * or with status {@code 400 (Bad Request)} if the emotionDTOs are not valid,
+     * or with status {@code 500 (Internal Server Error)} if the emotionDTOs could not be updated.
+     */
+    @PostMapping("/analyses/{id}/emotional")
+    public ResponseEntity<Collection<EmotionDTO>> upsertEmotional(
+        @PathVariable("projectId") Long projectId,
+        @PathVariable("textId") Long textId,
+        @PathVariable("id") String analysisId,
+        @Valid @RequestBody List<EmotionDTO> emotionDTOs
+    ) {
+        log.debug("REST request to upsert emotions {} from analysis {} in text {} of project {}", emotionDTOs, analysisId, textId, projectId);
+        Collection<EmotionDTO> result = analysisService.upsertEmotional(projectId, textId, analysisId, emotionDTOs);
+        return ResponseEntity.ok().body(result);
     }
 }

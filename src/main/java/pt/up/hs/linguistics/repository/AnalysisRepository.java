@@ -2,7 +2,6 @@ package pt.up.hs.linguistics.repository;
 
 import pt.up.hs.linguistics.domain.Analysis;
 
-import org.springframework.data.mongodb.repository.Query;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -17,11 +16,21 @@ import java.util.Optional;
 @Repository
 public interface AnalysisRepository extends MongoRepository<Analysis, String> {
 
-    List<Analysis> findByProjectIdAndTextId(@NotNull Long projectId, @NotNull Long textId);
+    List<FullAnalysis> findFullAnalysesByProjectIdAndTextId(@NotNull Long projectId, @NotNull Long textId);
 
-    Optional<Analysis> findFirstByProjectIdAndTextId(@NotNull Long projectId, @NotNull Long textId);
+    Optional<FullAnalysis> findFirstFullAnalysisByProjectIdAndTextId(@NotNull Long projectId, @NotNull Long textId);
 
-    Optional<Analysis> findByProjectIdAndTextIdAndId(
+    Optional<FullAnalysis> findFullAnalysisByProjectIdAndTextIdAndId(
+        @NotNull Long projectId,
+        @NotNull Long textId,
+        @NotNull String id
+    );
+
+    List<Analysis> findAnalysesByProjectIdAndTextId(@NotNull Long projectId, @NotNull Long textId);
+
+    Optional<Analysis> findFirstAnalysisByProjectIdAndTextId(@NotNull Long projectId, @NotNull Long textId);
+
+    Optional<Analysis> findAnalysisByProjectIdAndTextIdAndId(
         @NotNull Long projectId,
         @NotNull Long textId,
         @NotNull String id

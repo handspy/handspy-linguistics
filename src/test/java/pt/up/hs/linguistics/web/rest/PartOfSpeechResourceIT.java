@@ -122,7 +122,7 @@ public class PartOfSpeechResourceIT {
         // Create the PartOfSpeech
         PartOfSpeechDTO partOfSpeechDTO = partOfSpeechMapper.toDto(partOfSpeech);
         restPartOfSpeechMockMvc.perform(
-            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/parts-of-speech", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
@@ -148,7 +148,7 @@ public class PartOfSpeechResourceIT {
 
         // An entity with an existing ID cannot be created, so this API call must fail
         restPartOfSpeechMockMvc.perform(
-            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/parts-of-speech", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
@@ -171,7 +171,7 @@ public class PartOfSpeechResourceIT {
 
 
         restPartOfSpeechMockMvc.perform(
-            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/parts-of-speech", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
@@ -192,7 +192,7 @@ public class PartOfSpeechResourceIT {
 
 
         restPartOfSpeechMockMvc.perform(
-            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/parts-of-speech", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
@@ -212,7 +212,7 @@ public class PartOfSpeechResourceIT {
         PartOfSpeechDTO partOfSpeechDTO = partOfSpeechMapper.toDto(partOfSpeech);
 
         restPartOfSpeechMockMvc.perform(
-            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+            post("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/parts-of-speech", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
@@ -229,7 +229,7 @@ public class PartOfSpeechResourceIT {
 
         // Get all the partOfSpeechList
         restPartOfSpeechMockMvc.perform(
-            get("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches?sort=id,desc", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+            get("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/parts-of-speech?sort=id,desc", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
         )
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -247,7 +247,7 @@ public class PartOfSpeechResourceIT {
 
         // Get the partOfSpeech
         restPartOfSpeechMockMvc.perform(
-            get("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches/{id}", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID, partOfSpeech.getId())
+            get("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/parts-of-speech/{id}", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID, partOfSpeech.getId())
         )
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON_VALUE))
@@ -261,7 +261,7 @@ public class PartOfSpeechResourceIT {
     public void getNonExistingPartOfSpeech() throws Exception {
         // Get the partOfSpeech
         restPartOfSpeechMockMvc.perform(
-            get("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches/{id}", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID, Long.MAX_VALUE)
+            get("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/parts-of-speech/{id}", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID, Long.MAX_VALUE)
         )
             .andExpect(status().isNotFound());
     }
@@ -283,7 +283,7 @@ public class PartOfSpeechResourceIT {
         PartOfSpeechDTO partOfSpeechDTO = partOfSpeechMapper.toDto(updatedPartOfSpeech);
 
         restPartOfSpeechMockMvc.perform(
-            put("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+            put("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/parts-of-speech", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
@@ -308,7 +308,7 @@ public class PartOfSpeechResourceIT {
 
         // If the entity doesn't have an ID, it will throw BadRequestAlertException
         restPartOfSpeechMockMvc.perform(
-            put("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
+            put("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/parts-of-speech", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID)
                 .with(csrf())
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtil.convertObjectToJsonBytes(partOfSpeechDTO))
@@ -328,7 +328,7 @@ public class PartOfSpeechResourceIT {
 
         // Delete the partOfSpeech
         restPartOfSpeechMockMvc.perform(
-            delete("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/part-of-speeches/{id}", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID, partOfSpeech.getId())
+            delete("/api/projects/{projectId}/texts/{textId}/analyses/{analysisId}/parts-of-speech/{id}", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, DEFAULT_ANALYSIS_ID, partOfSpeech.getId())
                 .with(csrf())
                 .accept(MediaType.APPLICATION_JSON)
         ).andExpect(status().isNoContent());

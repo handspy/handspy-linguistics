@@ -4,23 +4,24 @@ import org.zalando.problem.Status;
 import pt.up.hs.linguistics.constants.EntityNames;
 import pt.up.hs.linguistics.constants.ErrorKeys;
 import pt.up.hs.linguistics.domain.Analysis;
+import pt.up.hs.linguistics.repository.FullAnalysis;
 import pt.up.hs.linguistics.repository.AnalysisRepository;
 import pt.up.hs.linguistics.service.EmotionService;
 import pt.up.hs.linguistics.domain.Emotion;
 import pt.up.hs.linguistics.repository.EmotionRepository;
 import pt.up.hs.linguistics.service.dto.EmotionDTO;
 import pt.up.hs.linguistics.service.exceptions.ServiceException;
+import pt.up.hs.linguistics.service.mapper.AnalysisMapper;
 import pt.up.hs.linguistics.service.mapper.EmotionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.stereotype.Service;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static org.zalando.problem.Status.NOT_FOUND;
 
 /**
  * Service Implementation for managing {@link Emotion}.
@@ -31,16 +32,19 @@ public class EmotionServiceImpl implements EmotionService {
     private final Logger log = LoggerFactory.getLogger(EmotionServiceImpl.class);
 
     private final AnalysisRepository analysisRepository;
+    private final AnalysisMapper analysisMapper;
 
     private final EmotionRepository emotionRepository;
     private final EmotionMapper emotionMapper;
 
     public EmotionServiceImpl(
         AnalysisRepository analysisRepository,
+        AnalysisMapper analysisMapper,
         EmotionRepository emotionRepository,
         EmotionMapper emotionMapper
     ) {
         this.analysisRepository = analysisRepository;
+        this.analysisMapper = analysisMapper;
         this.emotionRepository = emotionRepository;
         this.emotionMapper = emotionMapper;
     }
@@ -57,8 +61,8 @@ public class EmotionServiceImpl implements EmotionService {
     @Override
     public EmotionDTO save(Long projectId, Long textId, String analysisId, EmotionDTO emotionDTO) {
         log.debug("Request to save emotion {} from analysis {} in text {} of project {}", emotionDTO, analysisId, textId, projectId);
-        Optional<Analysis> analysis = analysisRepository
-            .findByProjectIdAndTextIdAndId(projectId, textId, analysisId);
+        Optional<FullAnalysis> analysis = analysisRepository
+            .findFullAnalysisByProjectIdAndTextIdAndId(projectId, textId, analysisId);
         if (!analysis.isPresent()) {
             throw new ServiceException(
                 Status.NOT_FOUND,
@@ -68,7 +72,7 @@ public class EmotionServiceImpl implements EmotionService {
             );
         }
         Emotion emotion = emotionMapper.toEntity(emotionDTO);
-        emotion.analysis(analysis.get());
+        emotion.analysis(analysisMapper.fromId(analysisId));
         emotion = emotionRepository.save(emotion);
         return emotionMapper.toDto(emotion);
     }
@@ -84,15 +88,17 @@ public class EmotionServiceImpl implements EmotionService {
     @Override
     public List<EmotionDTO> findAll(Long projectId, Long textId, String analysisId) {
         log.debug("Request to get all emotions from analysis {} in text {} of project {}", analysisId, textId, projectId);
-        return emotionRepository
-            .findByAnalysisId(analysisId)
-            .stream()
-            .filter(emotion ->
-                Objects.equals(emotion.getAnalysis().getProjectId(), projectId) &&
-                    Objects.equals(emotion.getAnalysis().getTextId(), textId)
-            )
+        Analysis analysis = analysisRepository
+            .findAnalysisByProjectIdAndTextIdAndId(projectId, textId, analysisId)
+            .orElse(null);
+        if (analysis == null) {
+            throw new ServiceException(NOT_FOUND, EntityNames.ANALYSIS, ErrorKeys.ERR_NOT_FOUND, "Analysis not found");
+        }
+        return emotionRepository.findByAnalysisId(analysisId)
+            .parallelStream()
+            .peek(emotion -> emotion.setAnalysis(analysis))
             .map(emotionMapper::toDto)
-            .collect(Collectors.toCollection(LinkedList::new));
+            .collect(Collectors.toList());
     }
 
 
@@ -108,11 +114,15 @@ public class EmotionServiceImpl implements EmotionService {
     @Override
     public Optional<EmotionDTO> findOne(Long projectId, Long textId, String analysisId, String id) {
         log.debug("Request to get emotion {} from analysis {} in text {} of project {}", id, analysisId, textId, projectId);
-        Optional<Emotion> emotion = emotionRepository.findByAnalysisIdAndId(analysisId, id);
-        if (!emotion.isPresent() || !(
-            Objects.equals(emotion.get().getAnalysis().getProjectId(), projectId) &&
-                Objects.equals(emotion.get().getAnalysis().getTextId(), textId)
-        )) {
+        Analysis analysis = analysisRepository
+            .findAnalysisByProjectIdAndTextIdAndId(projectId, textId, analysisId)
+            .orElse(null);
+        if (analysis == null) {
+            throw new ServiceException(NOT_FOUND, EntityNames.ANALYSIS, ErrorKeys.ERR_NOT_FOUND, "Analysis not found");
+        }
+        Optional<Emotion> emotion = emotionRepository
+            .findByAnalysisIdAndId(analysisId, id);
+        if (!emotion.isPresent()) {
             return Optional.empty();
         }
         return emotion.map(emotionMapper::toDto);
@@ -129,11 +139,15 @@ public class EmotionServiceImpl implements EmotionService {
     @Override
     public void delete(Long projectId, Long textId, String analysisId, String id) {
         log.debug("Request to delete emotion {} from analysis {} in text {} of project {}", id, analysisId, textId, projectId);
-        Optional<Emotion> emotion = emotionRepository.findByAnalysisIdAndId(analysisId, id);
-        if (!emotion.isPresent() || !(
-            Objects.equals(emotion.get().getAnalysis().getProjectId(), projectId) &&
-                Objects.equals(emotion.get().getAnalysis().getTextId(), textId)
-        )) {
+        Analysis analysis = analysisRepository
+            .findAnalysisByProjectIdAndTextIdAndId(projectId, textId, analysisId)
+            .orElse(null);
+        if (analysis == null) {
+            throw new ServiceException(NOT_FOUND, EntityNames.ANALYSIS, ErrorKeys.ERR_NOT_FOUND, "Analysis not found");
+        }
+        Optional<Emotion> emotion = emotionRepository
+            .findByAnalysisIdAndId(analysisId, id);
+        if (!emotion.isPresent()) {
             return;
         }
         emotionRepository.delete(emotion.get());

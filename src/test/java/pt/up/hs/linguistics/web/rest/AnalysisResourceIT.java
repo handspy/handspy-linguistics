@@ -19,6 +19,7 @@ import pt.up.hs.linguistics.client.sampling.dto.Text;
 import pt.up.hs.linguistics.config.SecurityBeanOverrideConfiguration;
 import pt.up.hs.linguistics.domain.Analysis;
 import pt.up.hs.linguistics.domain.enumeration.Status;
+import pt.up.hs.linguistics.repository.FullAnalysis;
 import pt.up.hs.linguistics.repository.AnalysisRepository;
 import pt.up.hs.linguistics.service.AnalysisService;
 import pt.up.hs.linguistics.service.dto.AnalysisDTO;
@@ -89,7 +90,7 @@ public class AnalysisResourceIT {
     private AnalysisService analysisService;
 
     @Autowired
-    private MappingJackson2HttpMessageConverter jacksonMessageConverter;
+    private MappingJackson2HttpMessageConverter mappingJackson2HttpMessageConverter;
 
     @Autowired
     private PageableHandlerMethodArgumentResolver pageableArgumentResolver;
@@ -115,7 +116,7 @@ public class AnalysisResourceIT {
             .setCustomArgumentResolvers(pageableArgumentResolver)
             .setControllerAdvice(exceptionTranslator)
             .setConversionService(createFormattingConversionService())
-            .setMessageConverters(jacksonMessageConverter)
+            .setMessageConverters(mappingJackson2HttpMessageConverter)
             .setValidator(validator)
             .build();
     }
@@ -157,7 +158,7 @@ public class AnalysisResourceIT {
 
     @Test
     public void createAnalysis() throws Exception {
-        int databaseSizeBeforeCreate = analysisRepository.findAll().size();
+        int databaseSizeBeforeCreate = analysisRepository.findFullAnalysesByProjectIdAndTextId(DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID).size();
         // Create the Analysis
         AnalysisDTO analysisDTO = analysisMapper.toDto(analysis);
         restAnalysisMockMvc.perform(post("/api/projects/{projectId}/texts/{textId}/analyses?analyze=false", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID)
@@ -167,9 +168,9 @@ public class AnalysisResourceIT {
             .andExpect(status().isCreated());
 
         // Validate the Analysis in the database
-        List<Analysis> analysisList = analysisRepository.findAll();
+        List<FullAnalysis> analysisList = analysisRepository.findFullAnalysesByProjectIdAndTextId(DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID);
         assertThat(analysisList).hasSize(databaseSizeBeforeCreate + 1);
-        Analysis testAnalysis = analysisList.get(analysisList.size() - 1);
+        FullAnalysis testAnalysis = analysisList.get(analysisList.size() - 1);
         assertThat(testAnalysis.getProjectId()).isEqualTo(DEFAULT_PROJECT_ID);
         assertThat(testAnalysis.getTextId()).isEqualTo(DEFAULT_TEXT_ID);
         assertThat(testAnalysis.getLanguage()).isEqualTo(DEFAULT_LANGUAGE);
@@ -184,7 +185,7 @@ public class AnalysisResourceIT {
         )
             .thenReturn(getText());
 
-        int databaseSizeBeforeCreate = analysisRepository.findAll().size();
+        int databaseSizeBeforeCreate = analysisRepository.findFullAnalysesByProjectIdAndTextId(DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID).size();
 
         // Create the Linguistic Analysis
         AnalysisDTO analysisDTO = analysisMapper.toDto(analysis);
@@ -194,9 +195,9 @@ public class AnalysisResourceIT {
             .andExpect(status().isCreated());
 
         // Validate the Linguistic Analysis in the database
-        List<Analysis> analysisList = analysisRepository.findAll();
+        List<FullAnalysis> analysisList = analysisRepository.findFullAnalysesByProjectIdAndTextId(DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID);
         assertThat(analysisList).hasSize(databaseSizeBeforeCreate + 1);
-        Analysis testAnalysis = analysisList.get(analysisList.size() - 1);
+        FullAnalysis testAnalysis = analysisList.get(analysisList.size() - 1);
         assertThat(testAnalysis.getProjectId()).isEqualTo(DEFAULT_PROJECT_ID);
         assertThat(testAnalysis.getTextId()).isEqualTo(DEFAULT_TEXT_ID);
         assertThat(testAnalysis.getCharacterCount()).isEqualTo(1424);
@@ -229,7 +230,7 @@ public class AnalysisResourceIT {
 
     @Test
     public void createAnalysisWithExistingId() throws Exception {
-        int databaseSizeBeforeCreate = analysisRepository.findAll().size();
+        int databaseSizeBeforeCreate = analysisRepository.findFullAnalysesByProjectIdAndTextId(DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID).size();
 
         // Create the Analysis with an existing ID
         analysis.setId("existing_id");
@@ -243,7 +244,7 @@ public class AnalysisResourceIT {
             .andExpect(status().isBadRequest());
 
         // Validate the Analysis in the database
-        List<Analysis> analysisList = analysisRepository.findAll();
+        List<FullAnalysis> analysisList = analysisRepository.findFullAnalysesByProjectIdAndTextId(DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID);
         assertThat(analysisList).hasSize(databaseSizeBeforeCreate);
     }
 
@@ -291,7 +292,7 @@ public class AnalysisResourceIT {
         // Initialize the database
         analysisRepository.save(analysis);
 
-        int databaseSizeBeforeUpdate = analysisRepository.findAll().size();
+        int databaseSizeBeforeUpdate = analysisRepository.findFullAnalysesByProjectIdAndTextId(DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID).size();
 
         // Update the analysis
         Analysis updatedAnalysis = analysisRepository.findById(analysis.getId()).get();
@@ -308,9 +309,9 @@ public class AnalysisResourceIT {
             .andExpect(status().isOk());
 
         // Validate the Analysis in the database
-        List<Analysis> analysisList = analysisRepository.findAll();
+        List<FullAnalysis> analysisList = analysisRepository.findFullAnalysesByProjectIdAndTextId(DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID);
         assertThat(analysisList).hasSize(databaseSizeBeforeUpdate);
-        Analysis testAnalysis = analysisList.get(analysisList.size() - 1);
+        FullAnalysis testAnalysis = analysisList.get(analysisList.size() - 1);
         assertThat(testAnalysis.getProjectId()).isEqualTo(DEFAULT_PROJECT_ID);
         assertThat(testAnalysis.getTextId()).isEqualTo(DEFAULT_TEXT_ID);
         assertThat(testAnalysis.getLanguage()).isEqualTo(UPDATED_LANGUAGE);
@@ -319,7 +320,7 @@ public class AnalysisResourceIT {
 
     @Test
     public void updateNonExistingAnalysis() throws Exception {
-        int databaseSizeBeforeUpdate = analysisRepository.findAll().size();
+        int databaseSizeBeforeUpdate = analysisRepository.findFullAnalysesByProjectIdAndTextId(DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID).size();
 
         // Create the Analysis
         AnalysisDTO analysisDTO = analysisMapper.toDto(analysis);
@@ -331,7 +332,7 @@ public class AnalysisResourceIT {
             .andExpect(status().isBadRequest());
 
         // Validate the Analysis in the database
-        List<Analysis> analysisList = analysisRepository.findAll();
+        List<FullAnalysis> analysisList = analysisRepository.findFullAnalysesByProjectIdAndTextId(DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID);
         assertThat(analysisList).hasSize(databaseSizeBeforeUpdate);
     }
 
@@ -340,7 +341,7 @@ public class AnalysisResourceIT {
         // Initialize the database
         analysisRepository.save(analysis);
 
-        int databaseSizeBeforeDelete = analysisRepository.findAll().size();
+        int databaseSizeBeforeDelete = analysisRepository.findFullAnalysesByProjectIdAndTextId(DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID).size();
 
         // Delete the analysis
         restAnalysisMockMvc.perform(delete("/api/projects/{projectId}/texts/{textId}/analyses/{id}", DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID, analysis.getId())
@@ -349,7 +350,7 @@ public class AnalysisResourceIT {
             .andExpect(status().isNoContent());
 
         // Validate the database contains one less item
-        List<Analysis> analysisList = analysisRepository.findAll();
+        List<FullAnalysis> analysisList = analysisRepository.findFullAnalysesByProjectIdAndTextId(DEFAULT_PROJECT_ID, DEFAULT_TEXT_ID);
         assertThat(analysisList).hasSize(databaseSizeBeforeDelete - 1);
     }
 }

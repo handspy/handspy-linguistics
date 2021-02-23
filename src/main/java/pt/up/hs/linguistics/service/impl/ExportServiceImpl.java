@@ -11,8 +11,8 @@ import pt.up.hs.linguistics.client.sampling.SamplingFeignClient;
 import pt.up.hs.linguistics.client.sampling.dto.Text;
 import pt.up.hs.linguistics.constants.EntityNames;
 import pt.up.hs.linguistics.constants.ErrorKeys;
-import pt.up.hs.linguistics.domain.Analysis;
 import pt.up.hs.linguistics.reporting.LinguisticsReportBuilder;
+import pt.up.hs.linguistics.repository.FullAnalysis;
 import pt.up.hs.linguistics.repository.AnalysisRepository;
 import pt.up.hs.linguistics.service.ExportService;
 import pt.up.hs.linguistics.service.exceptions.ServiceException;
@@ -88,8 +88,8 @@ public class ExportServiceImpl implements ExportService {
         LinguisticsReportBuilder lrBuilder, Long projectId, Long textId
     ) {
 
-        Analysis analysis = analysisRepository
-            .findFirstByProjectIdAndTextId(projectId, textId)
+        FullAnalysis analysis = analysisRepository
+            .findFirstFullAnalysisByProjectIdAndTextId(projectId, textId)
             .orElse(null);
 
         if (analysis == null) {
