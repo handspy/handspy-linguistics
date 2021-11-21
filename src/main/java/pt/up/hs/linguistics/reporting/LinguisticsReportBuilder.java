@@ -244,8 +244,9 @@ public class LinguisticsReportBuilder {
             });
         }
 
-        Map<String, Long> groupedEmotions = emotions.stream()
-            .flatMap(Set::stream).collect(Collectors.toSet()).stream()
+        Set<Emotion> allEmotions = emotions.stream()
+            .flatMap(Set::stream).collect(Collectors.toSet());
+        Map<String, Long> groupedEmotions = allEmotions.stream()
             .collect(Collectors.groupingBy(Emotion::toDisplayString, Collectors.counting()));
         groupedEmotions.entrySet().stream()
             .sorted(Comparator.comparingLong(Map.Entry<String, Long>::getValue).reversed())
@@ -261,7 +262,7 @@ public class LinguisticsReportBuilder {
                 sheet.addRow(new Object[]{
                     emotion.getKey(),
                     emotion.getValue(),
-                    (double) emotion.getValue() / emotions.size() * 100,
+                    (double) emotion.getValue() / allEmotions.size() * 100,
                     String.join("; ", words)
                 });
             });
