@@ -213,6 +213,9 @@ public class LinguisticsReportBuilder {
     ) {
 
         ExcelSheet sheet = new ExcelSheet();
+        sheet.setName(
+            i18n.getMessage("report.emotionsSummary", null, LocaleContextHolder.getLocale())
+        );
         sheet.setHeader(
             i18n.getMessage("report.emotions.category", null, LocaleContextHolder.getLocale()),
             i18n.getMessage("report.emotions.count", null, LocaleContextHolder.getLocale()),
