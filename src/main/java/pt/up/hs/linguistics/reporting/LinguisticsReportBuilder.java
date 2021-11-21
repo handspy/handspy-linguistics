@@ -18,6 +18,7 @@ public class LinguisticsReportBuilder {
 
     //private final ExcelSheet summarySheet = new ExcelSheet();
     private final Map<String, Object[]> summaryValues = new HashMap<>();
+    private ExcelSheet emotionalSummarySheet = null;
     private final Map<String, ExcelSheet> wordFrequenciesSheets = new HashMap<>();
     private final Map<String, ExcelSheet> posTagsSheets = new HashMap<>();
     private final Map<String, ExcelSheet> coOccurrencesSheets = new HashMap<>();
@@ -206,6 +207,67 @@ public class LinguisticsReportBuilder {
         return this;
     }
 
+    public LinguisticsReportBuilder createEmotionalSummarySheet(
+        List<Set<Emotion>> emotions,
+        List<Text> texts
+    ) {
+
+        ExcelSheet sheet = new ExcelSheet();
+        sheet.setHeader(
+            i18n.getMessage("report.emotions.category", null, LocaleContextHolder.getLocale()),
+            i18n.getMessage("report.emotions.count", null, LocaleContextHolder.getLocale()),
+            i18n.getMessage("report.emotions.percentage", null, LocaleContextHolder.getLocale()),
+            i18n.getMessage("report.emotions.words", null, LocaleContextHolder.getLocale())
+        );
+
+        Map<String, List<String>> wordsByEmotion = new HashMap<>();
+        for (int i = 0; i < emotions.size(); i++) {
+            Set<Emotion> textEmotions = emotions.get(i);
+            String textStr = texts.get(i).getText();
+            Map<String, List<String>> textWordsByEmotion = textEmotions.stream()
+                .collect(Collectors.groupingBy(
+                    Emotion::toDisplayString,
+                    Collectors.mapping(
+                        e -> textStr.substring(e.getStart(), e.getStart() + e.getSize()).toLowerCase(),
+                        Collectors.toList()
+                    )
+                ));
+            textWordsByEmotion.keySet().forEach(key -> {
+                if (wordsByEmotion.containsKey(key)) {
+                    wordsByEmotion.get(key).addAll(textWordsByEmotion.get(key));
+                } else {
+                    wordsByEmotion.put(key, textWordsByEmotion.get(key));
+                }
+            });
+        }
+
+        Map<String, Long> groupedEmotions = emotions.stream()
+            .flatMap(Set::stream).collect(Collectors.toSet()).stream()
+            .collect(Collectors.groupingBy(Emotion::toDisplayString, Collectors.counting()));
+        groupedEmotions.entrySet().stream()
+            .sorted(Comparator.comparingLong(Map.Entry<String, Long>::getValue).reversed())
+            .forEachOrdered(emotion -> {
+                Set<String> words = wordsByEmotion.getOrDefault(emotion.getKey(), new ArrayList<>())
+                    .stream().parallel()
+                    .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+                    .entrySet()
+                    .stream()
+                    .map(e -> e.getValue() > 1 ? String.format("%s (%d)", e.getKey(), e.getValue()) : e.getKey())
+                    .collect(Collectors.toSet());
+
+                sheet.addRow(new Object[]{
+                    emotion.getKey(),
+                    emotion.getValue(),
+                    (double) emotion.getValue() / emotions.size() * 100,
+                    String.join("; ", words)
+                });
+            });
+
+        this.emotionalSummarySheet = sheet;
+
+        return this;
+    }
+
     public ExcelWorkbook conclude() {
 
         ExcelWorkbook workbook = new ExcelWorkbook();
@@ -218,6 +280,8 @@ public class LinguisticsReportBuilder {
             summarySheet.addRow(summaryValues.get(code));
         }
         workbook.addSheet(summarySheet);
+
+        if (emotionalSummarySheet != null) workbook.addSheet(emotionalSummarySheet);
 
         for (String code: codes) {
             if (wordFrequenciesSheets.containsKey(code)) {

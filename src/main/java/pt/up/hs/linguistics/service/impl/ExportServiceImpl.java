@@ -11,6 +11,7 @@ import pt.up.hs.linguistics.client.sampling.SamplingFeignClient;
 import pt.up.hs.linguistics.client.sampling.dto.Text;
 import pt.up.hs.linguistics.constants.EntityNames;
 import pt.up.hs.linguistics.constants.ErrorKeys;
+import pt.up.hs.linguistics.domain.Emotion;
 import pt.up.hs.linguistics.reporting.LinguisticsReportBuilder;
 import pt.up.hs.linguistics.repository.FullAnalysis;
 import pt.up.hs.linguistics.repository.AnalysisRepository;
@@ -19,7 +20,9 @@ import pt.up.hs.linguistics.service.exceptions.ServiceException;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * Service Implementation for managing exports.
@@ -52,7 +55,7 @@ public class ExportServiceImpl implements ExportService {
 
         LinguisticsReportBuilder lrBuilder = new LinguisticsReportBuilder(messageSource);
 
-        addReportToAnalysis(lrBuilder, projectId, textId);
+        addReportToAnalysis(lrBuilder, projectId, textId, new ArrayList<>(), new ArrayList<>());
 
         try {
             return lrBuilder.conclude().saveToStream();
@@ -70,11 +73,14 @@ public class ExportServiceImpl implements ExportService {
 
         LinguisticsReportBuilder lrBuilder = new LinguisticsReportBuilder(messageSource);
 
+        List<Text> texts = new ArrayList<>();
+        List<Set<Emotion>> emotions = new ArrayList<>();
+
         Arrays.stream(textIds)
-            .forEach(textId -> addReportToAnalysis(lrBuilder, projectId, textId));
+            .forEach(textId -> addReportToAnalysis(lrBuilder, projectId, textId, texts, emotions));
 
         try {
-            return lrBuilder.conclude().saveToStream();
+            return lrBuilder.createEmotionalSummarySheet(emotions, texts).conclude().saveToStream();
         } catch (IOException e) {
             throw new ServiceException(
                 EntityNames.ANALYSIS,
@@ -85,7 +91,8 @@ public class ExportServiceImpl implements ExportService {
     }
 
     private void addReportToAnalysis(
-        LinguisticsReportBuilder lrBuilder, Long projectId, Long textId
+        LinguisticsReportBuilder lrBuilder, Long projectId, Long textId,
+        List<Text> texts, List<Set<Emotion>> emotions
     ) {
 
         FullAnalysis analysis = analysisRepository
@@ -133,5 +140,7 @@ public class ExportServiceImpl implements ExportService {
         lrBuilder.newPoSTagSheet(code, analysis.getWordsByCategory());
         lrBuilder.newCoOccurrencesSheet(code, analysis.getCoOccurrences());
         lrBuilder.newEmotionalSheet(code, analysis.getEmotions(), text);
+        texts.add(text);
+        emotions.add(analysis.getEmotions());
     }
 }
