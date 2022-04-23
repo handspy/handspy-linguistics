@@ -219,6 +219,7 @@ public class AnalysisResourceIT {
         assertThat(testAnalysis.getLemmaFrequencies()).hasSize(115);
         assertThat(testAnalysis.getEmotions()).hasSize(7);
         assertThat(testAnalysis.getPartsOfSpeech()).hasSize(265);
+        assertThat(testAnalysis.getSentences()).hasSize(8);
     }
 
     private Text getText() {

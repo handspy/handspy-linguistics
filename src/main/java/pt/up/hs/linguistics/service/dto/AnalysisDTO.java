@@ -61,6 +61,8 @@ public class AnalysisDTO extends AbstractAuditingDTO {
 
     private Set<PartOfSpeechDTO> partsOfSpeech = new HashSet<>();
 
+    private Set<SentenceDTO> sentenceSummaries = new HashSet<>();
+
     public String getId() {
         return id;
     }
@@ -309,6 +311,14 @@ public class AnalysisDTO extends AbstractAuditingDTO {
         this.partsOfSpeech = partsOfSpeech;
     }
 
+    public Set<SentenceDTO> getSentenceSummaries() {
+        return sentenceSummaries;
+    }
+
+    public void setSentenceSummaries(Set<SentenceDTO> sentenceSummaries) {
+        this.sentenceSummaries = sentenceSummaries;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -361,6 +371,7 @@ public class AnalysisDTO extends AbstractAuditingDTO {
             ", ideaDensity=" + ideaDensity +
             ", emotions=" + emotions +
             ", partsOfSpeech=" + partsOfSpeech +
+            ", sentenceSummaries=" + sentenceSummaries +
             '}';
     }
 }

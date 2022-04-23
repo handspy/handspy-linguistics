@@ -3,6 +3,7 @@ package pt.up.hs.linguistics.repository;
 import org.springframework.beans.factory.annotation.Value;
 import pt.up.hs.linguistics.domain.Emotion;
 import pt.up.hs.linguistics.domain.PartOfSpeech;
+import pt.up.hs.linguistics.domain.Sentence;
 import pt.up.hs.linguistics.domain.enumeration.PoSTag;
 import pt.up.hs.linguistics.domain.enumeration.Status;
 
@@ -53,4 +54,7 @@ public interface FullAnalysis {
 
     @Value("#{@partOfSpeechRepository.findByAnalysisId(target.id)}")
     Set<PartOfSpeech> getPartsOfSpeech();
+
+    @Value("#{@sentenceRepository.findByAnalysisId(target.id)}")
+    Set<Sentence> getSentences();
 }

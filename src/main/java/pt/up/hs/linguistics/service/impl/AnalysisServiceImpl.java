@@ -7,6 +7,7 @@ import pt.up.hs.linguini.Linguini;
 import pt.up.hs.linguini.analysis.cooccurrence.CoOccurrence;
 import pt.up.hs.linguini.exceptions.LinguiniException;
 import pt.up.hs.linguini.models.LinguisticsReport;
+import pt.up.hs.linguini.models.SentenceSummary;
 import pt.up.hs.linguistics.client.sampling.SamplingFeignClient;
 import pt.up.hs.linguistics.client.sampling.dto.Text;
 import pt.up.hs.linguistics.constants.EntityNames;
@@ -14,10 +15,12 @@ import pt.up.hs.linguistics.constants.ErrorKeys;
 import pt.up.hs.linguistics.domain.Analysis;
 import pt.up.hs.linguistics.domain.Emotion;
 import pt.up.hs.linguistics.domain.PartOfSpeech;
+import pt.up.hs.linguistics.domain.Sentence;
 import pt.up.hs.linguistics.domain.enumeration.*;
 import pt.up.hs.linguistics.repository.AnalysisRepository;
 import pt.up.hs.linguistics.repository.EmotionRepository;
 import pt.up.hs.linguistics.repository.PartOfSpeechRepository;
+import pt.up.hs.linguistics.repository.SentenceRepository;
 import pt.up.hs.linguistics.service.AnalysisService;
 import pt.up.hs.linguistics.service.dto.AnalysisDTO;
 import pt.up.hs.linguistics.service.dto.EmotionDTO;
@@ -48,6 +51,8 @@ public class AnalysisServiceImpl implements AnalysisService {
 
     private final PartOfSpeechRepository partOfSpeechRepository;
 
+    private final SentenceRepository sentenceRepository;
+
     private final SamplingFeignClient samplingFeignClient;
 
     public AnalysisServiceImpl(
@@ -59,6 +64,8 @@ public class AnalysisServiceImpl implements AnalysisService {
 
         PartOfSpeechRepository partOfSpeechRepository,
 
+        SentenceRepository sentenceRepository,
+
         SamplingFeignClient samplingFeignClient
     ) {
         this.analysisRepository = analysisRepository;
@@ -66,6 +73,7 @@ public class AnalysisServiceImpl implements AnalysisService {
         this.emotionRepository = emotionRepository;
         this.emotionMapper = emotionMapper;
         this.partOfSpeechRepository = partOfSpeechRepository;
+        this.sentenceRepository = sentenceRepository;
         this.samplingFeignClient = samplingFeignClient;
     }
 
@@ -185,6 +193,18 @@ public class AnalysisServiceImpl implements AnalysisService {
 
             partOfSpeechRepository.saveAll(partsOfSpeech);
             // savedAnalysis.partsOfSpeech(new HashSet<>(partsOfSpeech));
+
+            List<Sentence> sentences = report.getSentenceSummaries()
+                .parallelStream()
+                .map(sentenceSummary -> new Sentence()
+                    .analysis(analysisMapper.fromId(savedAnalysis.getId()))
+                    .start(sentenceSummary.getStart())
+                    .size(sentenceSummary.getSize())
+                    .nrOfWords(sentenceSummary.getNrOfWords())
+                )
+                .collect(Collectors.toList());
+
+            sentenceRepository.saveAll(sentences);
 
             return analysisMapper.toDto(analysis);
 
@@ -318,5 +338,6 @@ public class AnalysisServiceImpl implements AnalysisService {
     private void deleteLinkedData(String analysisId) {
         emotionRepository.deleteByAnalysisId(analysisId);
         partOfSpeechRepository.deleteByAnalysisId(analysisId);
+        sentenceRepository.deleteByAnalysisId(analysisId);
     }
 }

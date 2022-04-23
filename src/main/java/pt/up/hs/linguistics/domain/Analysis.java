@@ -119,6 +119,11 @@ public class Analysis implements Serializable {
     @Field("part_of_speech")
     private Set<PartOfSpeech> partsOfSpeech = new HashSet<>();
 
+    @DBRef(lazy = true)
+    @Reference(to = Sentence.class)
+    @Field("sentence_summary")
+    private Set<Sentence> sentenceSummaries = new HashSet<>();
+
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public String getId() {
         return id;
@@ -611,6 +616,34 @@ public class Analysis implements Serializable {
     public void setPartsOfSpeech(Set<PartOfSpeech> partsOfSpeech) {
         this.partsOfSpeech = partsOfSpeech;
     }
+
+    public Set<Sentence> getSentenceSummaries() {
+        return sentenceSummaries;
+    }
+
+    public Analysis sentenceSummaries(Set<Sentence> sentenceSummaries) {
+        this.sentenceSummaries = sentenceSummaries;
+        if (sentenceSummaries != null) {
+            sentenceSummaries.parallelStream().forEach(sentence -> sentence.setAnalysis(this));
+        }
+        return this;
+    }
+
+    public Analysis addSentenceSummaries(Sentence sentence) {
+        this.sentenceSummaries.add(sentence);
+        sentence.setAnalysis(this);
+        return this;
+    }
+
+    public Analysis removeSentenceSummary(Sentence sentence) {
+        this.sentenceSummaries.remove(sentence);
+        sentence.setAnalysis(null);
+        return this;
+    }
+
+    public void setSentenceSummaries(Set<Sentence> sentenceSummaries) {
+        this.sentenceSummaries = sentenceSummaries;
+    }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -664,6 +697,7 @@ public class Analysis implements Serializable {
             ", ideaDensity=" + ideaDensity +
             ", emotions=" + emotions +
             ", partsOfSpeech=" + partsOfSpeech +
+            ", sentenceSummaries=" + sentenceSummaries +
             '}';
     }
 }

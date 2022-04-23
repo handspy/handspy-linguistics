@@ -12,6 +12,7 @@ import pt.up.hs.linguistics.client.sampling.dto.Text;
 import pt.up.hs.linguistics.constants.EntityNames;
 import pt.up.hs.linguistics.constants.ErrorKeys;
 import pt.up.hs.linguistics.domain.Emotion;
+import pt.up.hs.linguistics.domain.Sentence;
 import pt.up.hs.linguistics.reporting.LinguisticsReportBuilder;
 import pt.up.hs.linguistics.repository.FullAnalysis;
 import pt.up.hs.linguistics.repository.AnalysisRepository;
@@ -128,6 +129,7 @@ public class ExportServiceImpl implements ExportService {
             analysis.getFunctionalWordAvgLength(),
             analysis.getContentWordAvgLength(),
             analysis.getSentenceCount(),
+            analysis.getSentences().stream().mapToInt(Sentence::getNrOfWords).average().orElse(0),
             analysis.getLexicalDensity(),
             analysis.getBaseTTR(),
             analysis.getHdd(),
@@ -139,6 +141,7 @@ public class ExportServiceImpl implements ExportService {
         lrBuilder.newWordFrequencySheet(code, analysis.getContentWordFrequencies(), analysis.getFunctionalWordFrequencies());
         lrBuilder.newPoSTagSheet(code, analysis.getWordsByCategory());
         lrBuilder.newCoOccurrencesSheet(code, analysis.getCoOccurrences());
+        lrBuilder.newSentenceSummarySheet(code, analysis.getSentences(), text);
         lrBuilder.newEmotionalSheet(code, analysis.getEmotions(), text);
         texts.add(text);
         emotions.add(analysis.getEmotions());

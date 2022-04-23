@@ -2,8 +2,10 @@ package pt.up.hs.linguistics.reporting;
 
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
+import pt.up.hs.linguini.models.SentenceSummary;
 import pt.up.hs.linguistics.domain.Emotion;
 import pt.up.hs.linguistics.client.sampling.dto.Text;
+import pt.up.hs.linguistics.domain.Sentence;
 import pt.up.hs.linguistics.domain.enumeration.PoSTag;
 import pt.up.hs.linguistics.reporting.sheet.ExcelSheet;
 import pt.up.hs.linguistics.reporting.workbook.ExcelWorkbook;
@@ -22,6 +24,7 @@ public class LinguisticsReportBuilder {
     private final Map<String, ExcelSheet> wordFrequenciesSheets = new HashMap<>();
     private final Map<String, ExcelSheet> posTagsSheets = new HashMap<>();
     private final Map<String, ExcelSheet> coOccurrencesSheets = new HashMap<>();
+    private final Map<String, ExcelSheet> sentenceSheets = new HashMap<>();
     private final Map<String, ExcelSheet> emotionalSheets = new HashMap<>();
 
     public LinguisticsReportBuilder(
@@ -43,6 +46,7 @@ public class LinguisticsReportBuilder {
         Double functionWordAvgLength,
         Double contentWordAvgLength,
         Integer sentenceCount,
+        Double sentenceAvgWords,
         Double lexicalDensity,
         Double baseTTR, Double hdd, Double mtld, Double vocd,
         Double ideaDensity
@@ -58,6 +62,7 @@ public class LinguisticsReportBuilder {
             functionWordAvgLength,
             contentWordAvgLength,
             sentenceCount,
+            sentenceAvgWords,
             lexicalDensity,
             baseTTR, hdd, mtld, vocd,
             ideaDensity
@@ -207,6 +212,38 @@ public class LinguisticsReportBuilder {
         return this;
     }
 
+    public LinguisticsReportBuilder newSentenceSummarySheet(
+        String code,
+        Set<Sentence> sentences,
+        Text text
+    ) {
+
+        ExcelSheet sheet = new ExcelSheet();
+        sheet.setName(
+            i18n.getMessage("report.sentences", new String[]{code}, LocaleContextHolder.getLocale())
+        );
+        sheet.setHeader(
+            i18n.getMessage("report.sentences.sentence", null, LocaleContextHolder.getLocale()),
+            i18n.getMessage("report.sentences.words", null, LocaleContextHolder.getLocale())
+        );
+
+        String textStr = text.getText();
+        for (Sentence sentence: sentences) {
+            String sentenceStr = textStr.substring(
+                sentence.getStart(),
+                sentence.getStart() + sentence.getSize()
+            );
+            sheet.addRow(new Object[]{
+                sentenceStr,
+                sentence.getNrOfWords()
+            });
+        }
+
+        sentenceSheets.put(code, sheet);
+
+        return this;
+    }
+
     public LinguisticsReportBuilder createEmotionalSummarySheet(
         List<Set<Emotion>> emotions,
         List<Text> texts
@@ -297,6 +334,9 @@ public class LinguisticsReportBuilder {
             if (coOccurrencesSheets.containsKey(code)) {
                 workbook.addSheet(coOccurrencesSheets.get(code));
             }
+            if (sentenceSheets.containsKey(code)) {
+                workbook.addSheet(sentenceSheets.get(code));
+            }
             if (emotionalSheets.containsKey(code)) {
                 workbook.addSheet(emotionalSheets.get(code));
             }
@@ -327,6 +367,7 @@ public class LinguisticsReportBuilder {
             i18n.getMessage("report.summary.avgfunctionwordlength", null, LocaleContextHolder.getLocale()),
             i18n.getMessage("report.summary.avgcontentwordlength", null, LocaleContextHolder.getLocale()),
             i18n.getMessage("report.summary.sentences", null, LocaleContextHolder.getLocale()),
+            i18n.getMessage("report.summary.sentenceavgwords", null, LocaleContextHolder.getLocale()),
             i18n.getMessage("report.summary.lexicaldensity", null, LocaleContextHolder.getLocale()),
             i18n.getMessage("report.summary.basettr", null, LocaleContextHolder.getLocale()),
             i18n.getMessage("report.summary.hdd", null, LocaleContextHolder.getLocale()),
