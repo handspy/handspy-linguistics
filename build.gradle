@@ -6,6 +6,7 @@ buildscript {
         maven { url "https://repo.spring.io/plugins-release" }
     }
     dependencies {
+        classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
         //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
     }
 }
@@ -23,6 +24,7 @@ plugins {
     id "net.ltgt.apt"
     id "org.sonarqube"
     id "io.spring.nohttp"
+    id "com.jfrog.artifactory" version "4.28.0"
     //jhipster-needle-gradle-plugins - JHipster will add additional gradle plugins here
 }
 
@@ -61,6 +63,8 @@ if (project.hasProperty("gae")) {
     }
     appengineStage.dependsOn thinResolve
 }
+
+apply plugin: 'com.jfrog.artifactory'
 
 if (project.hasProperty("zipkin")) {
     apply from: "gradle/zipkin.gradle"
@@ -162,6 +166,19 @@ repositories {
     mavenCentral()
     jcenter()
     //jhipster-needle-gradle-repositories - JHipster will add additional repositories
+}
+
+artifactory {
+    contextUrl = "${artifactory_contextUrl}"
+    resolve {
+        repository {
+            repoKey = 'handspy-libs-release-local'
+            username = "${artifactory_user}"
+            password = "${artifactory_password}"
+            maven = true
+
+        }
+    }
 }
 
 dependencies {
