@@ -231,7 +231,7 @@ public class LinguisticsReportBuilder {
         for (Sentence sentence: sentences) {
             String sentenceStr = textStr.substring(
                 sentence.getStart(),
-                sentence.getStart() + sentence.getSize()
+                Math.min(sentence.getStart() + sentence.getSize(), textStr.length())
             );
             sheet.addRow(new Object[]{
                 sentenceStr,

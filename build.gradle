@@ -175,7 +175,7 @@ artifactory {
     contextUrl = "${artifactory_contextUrl}"
     resolve {
         repository {
-            repoKey = 'handspy-libs-release-local'
+            repoKey = 'linguini-libs-release-local'
             username = "${artifactory_user}"
             password = "${artifactory_password}"
             maven = true
