@@ -8,6 +8,11 @@ buildscript {
         }
         maven { url "https://repo.spring.io/plugins-release" }
     }
+    buildscript {
+        configurations.classpath {
+            attributes.attribute(Attribute.of("org.gradle.jvm.environment", String), "standard-jvm")
+        }
+    }
     dependencies {
         classpath "org.jfrog.buildinfo:build-info-extractor-gradle:4+"
         //jhipster-needle-gradle-buildscript-dependency - JHipster will add additional gradle build script plugins here
@@ -15,6 +20,7 @@ buildscript {
 }
 
 plugins {
+
     id "java"
     id "maven-publish"
     id "idea"
